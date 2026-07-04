@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: soley-api
+    env: node
+    buildCommand: cd server && npm install && npx prisma generate
+    startCommand: cd server && npx tsx index.ts
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+
+  - type: web
+    name: soley-frontend
+    env: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://soley-api.onrender.com/api

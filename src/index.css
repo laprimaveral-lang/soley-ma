@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-secondary font-sans antialiased overflow-x-hidden;
+    /* Soften the typography globally */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Custom scrollbar for a premium feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #E5E5E5;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #CCCCCC;
+  }
+
+  /* Utility classes for luxury animations */
+  .luxury-hover {
+    @apply transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)];
+  }
+}

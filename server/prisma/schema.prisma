@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  phone     String?
+  role      String     @default("customer")
+  createdAt DateTime   @default(now())
+  addresses Address[]
+  cart      Cart?
+  orders    Order[]
+  wishlists Wishlist[]
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  active      Boolean   @default(true)
+  products    Product[]
+}
+
+model Product {
+  id             String           @id @default(uuid())
+  reference      String
+  name           String
+  slug           String           @unique
+  description    String
+  categoryId     String
+  price          Float
+  salePrice      Float?
+  stock          Int              @default(0)
+  material       String?
+  weight         Float?
+  status         String           @default("draft")
+  seoTitle       String?
+  seoDescription String?
+  featured       Boolean          @default(false)
+  isNew          Boolean          @default(false)
+  isBestSeller   Boolean          @default(false)
+  active         Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  category       Category         @relation(fields: [categoryId], references: [id])
+  images         ProductImage[]
+  variants       ProductVariant[]
+  wishlists      Wishlist[]
+  collections    Collection[]     @relation("CollectionToProduct")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid())
+  productId String
+  image     String
+  position  Int     @default(0)
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Color {
+  id       String           @id @default(uuid())
+  name     String
+  hex      String
+  variants ProductVariant[]
+}
+
+model Size {
+  id       String           @id @default(uuid())
+  value    String
+  variants ProductVariant[]
+}
+
+model ProductVariant {
+  id         String      @id @default(uuid())
+  productId  String
+  colorId    String?
+  sizeId     String?
+  stock      Int         @default(0)
+  sku        String      @unique
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  color      Color?      @relation(fields: [colorId], references: [id])
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size       Size?       @relation(fields: [sizeId], references: [id])
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  customerId      String?
+  status          String      @default("pending")
+  subtotal        Float
+  shipping        Float       @default(0)
+  discount        Float       @default(0)
+  total           Float
+  createdAt       DateTime    @default(now())
+  customerName    String?
+  customerPhone   String?
+  shippingAddress String?
+  customer        User?       @relation(fields: [customerId], references: [id])
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id               String         @id @default(uuid())
+  orderId          String
+  productVariantId String
+  quantity         Int
+  price            Float
+  order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+}
+
+model Address {
+  id         String @id @default(uuid())
+  customerId String
+  country    String
+  city       String
+  address    String
+  postalCode String
+  customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+}
+
+model Coupon {
+  id       String  @id @default(uuid())
+  code     String  @unique
+  discount Float
+  type     String
+  active   Boolean @default(true)
+}
+
+model Wishlist {
+  id         String  @id @default(uuid())
+  customerId String
+  productId  String
+  customer   User    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, productId])
+}
+
+model Cart {
+  id         String     @id @default(uuid())
+  customerId String     @unique
+  customer   User       @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  items      CartItem[]
+}
+
+model CartItem {
+  id               String         @id @default(uuid())
+  cartId           String
+  productVariantId String
+  quantity         Int
+  cart             Cart           @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  @@unique([cartId, productVariantId])
+}
+
+model Banner {
+  id        String   @id @default(uuid())
+  title     String
+  image     String
+  link      String?
+  active    Boolean  @default(true)
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+model Collection {
+  id          String    @id @default(uuid())
+  name        String
+  slug        String    @unique
+  description String?
+  image       String?
+  active      Boolean   @default(true)
+  products    Product[] @relation("CollectionToProduct")
+}
