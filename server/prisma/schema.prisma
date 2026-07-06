@@ -55,6 +55,8 @@ model Product {
   variants       ProductVariant[]
   wishlists      Wishlist[]
   collections    Collection[]     @relation("CollectionToProduct")
+
+  @@index([categoryId])
 }
 
 model ProductImage {
@@ -63,6 +65,8 @@ model ProductImage {
   image     String
   position  Int     @default(0)
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
 }
 
 model Color {
@@ -90,6 +94,10 @@ model ProductVariant {
   color      Color?      @relation(fields: [colorId], references: [id])
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   size       Size?       @relation(fields: [sizeId], references: [id])
+
+  @@index([productId])
+  @@index([colorId])
+  @@index([sizeId])
 }
 
 model Order {
@@ -106,6 +114,8 @@ model Order {
   shippingAddress String?
   customer        User?       @relation(fields: [customerId], references: [id])
   items           OrderItem[]
+
+  @@index([customerId])
 }
 
 model OrderItem {
@@ -116,6 +126,9 @@ model OrderItem {
   price            Float
   order            Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
   productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+
+  @@index([orderId])
+  @@index([productVariantId])
 }
 
 model Address {
@@ -126,6 +139,8 @@ model Address {
   address    String
   postalCode String
   customer   User   @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@index([customerId])
 }
 
 model Coupon {
