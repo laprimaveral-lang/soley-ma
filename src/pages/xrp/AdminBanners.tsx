@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Image as ImageIcon } from 'lucide-react';
 import DataTable from '../../components/xrp/DataTable';
 import ConfirmDialog from '../../components/xrp/ConfirmDialog';
-import { BannerService } from '../../services/api';
+import { BannerService, api } from '../../services/api';
 
 export default function AdminBanners() {
   const [banners, setBanners] = useState<any[]>([]);
@@ -127,11 +127,8 @@ export default function AdminBanners() {
                       const uploadData = new FormData();
                       uploadData.append('images', file);
                       try {
-                        const res = await fetch('http://localhost:3001/api/upload', {
-                          method: 'POST',
-                          body: uploadData
-                        });
-                        const data = await res.json();
+                        const res = await api.post('/upload', uploadData);
+                        const data = res.data;
                         if (data.urls && data.urls.length > 0) {
                           setFormData({ ...formData, image: data.urls[0] });
                         }

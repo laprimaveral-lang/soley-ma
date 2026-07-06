@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { UploadCloud, X } from 'lucide-react';
+import { getMediaUrl } from '../../services/api';
 
 interface ImageUploaderProps {
   images: string[];
@@ -62,7 +63,7 @@ export default function ImageUploader({ images, onChange, onUpload }: ImageUploa
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {images.map((img, index) => (
             <div key={index} className="relative group rounded-xl overflow-hidden border border-gray-200 aspect-square">
-              <img src={img.startsWith('http') || img.startsWith('/') ? img : `http://localhost:3001${img}`} alt={`Upload ${index}`} className="w-full h-full object-cover" />
+              <img src={getMediaUrl(img)} alt={`Upload ${index}`} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 backdrop-blur-sm">
                 <button
                   type="button"

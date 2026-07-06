@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Truck, CreditCard, Droplets, RefreshCw, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { ProductService } from '../services/api';
+import { ProductService, getMediaUrl } from '../services/api';
 
 export default function Footer() {
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
@@ -13,7 +13,7 @@ export default function Footer() {
         const images: string[] = [];
         for (const p of products) {
           if (p.images && p.images.length > 0) {
-            images.push(`http://localhost:3001${p.images[0].image}`);
+            images.push(getMediaUrl(p.images[0].image));
             if (images.length === 5) break;
           }
         }

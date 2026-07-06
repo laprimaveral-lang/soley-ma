@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { OrderService } from '../../services/api';
+import { OrderService, getMediaUrl } from '../../services/api';
 import { Download, RefreshCw } from 'lucide-react';
 
 export default function OrdersView() {
@@ -8,44 +8,49 @@ export default function OrdersView() {
 
   useEffect(() => {
     OrderService.getCustomerOrders()
-      .then(data => {
-        setOrders(data);
+      .then((res: any) => {
+        setOrders(res);
         setLoading(false);
       })
       .catch(() => setLoading(false));
   }, []);
 
   if (loading) {
-    return <div className="text-sm font-bold tracking-widest uppercase text-gray-500">Chargement...</div>;
+    return (
+      <div className="flex justify-center items-center py-12">
+        <RefreshCw className="w-6 h-6 animate-spin text-gray-400" />
+      </div>
+    );
   }
 
   return (
     <div>
-      <h2 className="text-xl font-bold uppercase tracking-[0.2em] mb-10">Historique des commandes</h2>
-      
+      <h2 className="text-xl font-bold uppercase tracking-[0.2em] mb-10 border-b border-[#ECECEC] pb-4">Mes Commandes</h2>
+
       {orders.length === 0 ? (
-        <div className="bg-[#FAFAF8] p-12 text-center flex flex-col items-center justify-center">
-          <p className="text-sm text-gray-500 mb-6 font-bold tracking-widest uppercase">Aucune commande trouvée</p>
-          <a href="/collections/all" className="inline-block bg-black text-white px-8 py-3 text-xs font-bold tracking-widest uppercase hover:bg-gray-900 transition-colors">
-            Commencer vos achats
-          </a>
-        </div>
+        <p className="text-gray-500 tracking-wider">Vous n'avez pas encore passé de commande.</p>
       ) : (
-        <div className="space-y-8">
-          {orders.map(order => (
-            <div key={order.id} className="border border-[#ECECEC] p-6 lg:p-8">
-              <div className="flex flex-col md:flex-row justify-between md:items-center border-b border-[#ECECEC] pb-6 mb-6 gap-4">
+        <div className="space-y-12">
+          {orders.map((order: any) => (
+            <div key={order.id} className="border border-[#ECECEC] p-6 bg-white">
+              <div className="flex flex-wrap justify-between items-center gap-4 border-b border-[#ECECEC] pb-4 mb-6">
                 <div>
-                  <h3 className="text-sm font-bold tracking-widest uppercase mb-1">Commande #{order.id.substring(0, 8)}</h3>
-                  <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleDateString('fr-FR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Commande</p>
+                  <p className="text-sm font-semibold">#{order.id.substring(0, 8)}</p>
                 </div>
-                
-                <div className="flex flex-col md:items-end gap-2">
-                  <p className="font-serif text-xl">{order.total}.00 dh</p>
-                  <span className={`inline-block px-3 py-1 text-[10px] font-bold tracking-widest uppercase ${
-                    order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                    order.status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                    'bg-gray-100 text-gray-800'
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Date</p>
+                  <p className="text-sm font-semibold">{new Date(order.createdAt).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Total</p>
+                  <p className="text-sm font-semibold text-primary">{order.total.toFixed(2)} MAD</p>
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold tracking-widest uppercase text-gray-400 mb-1">Statut</p>
+                  <span className={`text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full ${
+                    order.status === 'delivered' ? 'bg-green-50 text-green-700' :
+                    order.status === 'cancelled' ? 'bg-red-50 text-red-700' : 'bg-orange-50 text-orange-700'
                   }`}>
                     {order.status === 'pending' ? 'En attente' : 
                      order.status === 'processing' ? 'En cours' : 
@@ -60,7 +65,7 @@ export default function OrdersView() {
                   <div key={item.id} className="flex gap-6 items-center">
                     <div className="w-20 h-24 bg-[#F5F5F0] overflow-hidden shrink-0">
                       {item.productVariant?.product?.images?.[0] ? (
-                        <img src={`http://localhost:3001${item.productVariant.product.images[0].image}`} alt="Product" className="w-full h-full object-cover" />
+                        <img src={getMediaUrl(item.productVariant.product.images[0].image)} alt="Product" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-300">...</div>
                       )}

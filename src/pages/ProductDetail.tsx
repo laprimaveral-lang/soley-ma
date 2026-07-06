@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingBag, Truck, ChevronRight, Check } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
-import { ProductService } from '../services/api';
+import { ProductService, OrderService, getMediaUrl } from '../services/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -44,7 +44,7 @@ export default function ProductDetail() {
         if (colors.length > 0) setSelectedColor(colors[0]);
         
         if (foundProduct.images && foundProduct.images.length > 0) {
-          setMainImage(`http://localhost:3001${foundProduct.images[0].image}`);
+          setMainImage(getMediaUrl(foundProduct.images[0].image));
         }
 
         setPackItems([
@@ -124,23 +124,22 @@ export default function ProductDetail() {
     const total = subtotal - discount;
 
     try {
-      // Create the order using API (to be imported)
-      const res = await fetch('http://localhost:3001/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: checkoutForm.name,
-          customerPhone: checkoutForm.phone,
-          shippingAddress: checkoutForm.address,
-          items,
-          subtotal,
-          discount,
-          total,
-          shipping: 0
-        })
+      const res = await OrderService.createOrder({
+        customerName: checkoutForm.name,
+        customerPhone: checkoutForm.phone,
+        shippingAddress: checkoutForm.address,
+        subtotal,
+        total,
+        shipping: 0,
+        discount,
+        items: items.map((i: any) => ({
+          productVariantId: i.variantId,
+          quantity: i.quantity,
+          price: i.price
+        }))
       });
 
-      if (res.ok) {
+      if (res) {
         setIsCheckoutModalOpen(false);
         alert('Votre commande a été confirmée avec succès !');
         // Optionally redirect to a thank you page
@@ -192,10 +191,10 @@ export default function ProductDetail() {
                   {product.images.map((img: any) => (
                     <button 
                       key={img.id}
-                      onClick={() => setMainImage(`http://localhost:3001${img.image}`)}
-                      className={`flex-shrink-0 w-20 md:w-full aspect-[3/4] border transition-all ${mainImage === `http://localhost:3001${img.image}` ? 'border-black' : 'border-transparent hover:border-gray-300'}`}
+                      onClick={() => setMainImage(getMediaUrl(img.image))}
+                      className={`flex-shrink-0 w-20 md:w-full aspect-[3/4] border transition-all ${mainImage === getMediaUrl(img.image) ? 'border-black' : 'border-transparent hover:border-gray-300'}`}
                     >
-                      <img src={`http://localhost:3001${img.image}`} className="w-full h-full object-cover" alt={`${product.name} thumbnail`} />
+                      <img src={getMediaUrl(img.image)} className="w-full h-full object-cover" alt={`${product.name} thumbnail`} />
                     </button>
                   ))}
                 </div>

@@ -3,7 +3,7 @@ import { Plus, Edit2, Trash2, Package } from 'lucide-react';
 import DataTable from '../../components/xrp/DataTable';
 import ConfirmDialog from '../../components/xrp/ConfirmDialog';
 import ImageUploader from '../../components/xrp/ImageUploader';
-import { ProductService, CategoryService, ColorService, SizeService } from '../../services/api';
+import { ProductService, CategoryService, ColorService, SizeService, getMediaUrl } from '../../services/api';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState<any[]>([]);
@@ -112,7 +112,7 @@ export default function AdminProducts() {
       header: 'Produit', 
       accessor: (row: any) => (
         <div className="flex items-center gap-4">
-          <img src={row.images?.[0]?.image ? `http://localhost:3001${row.images[0].image}` : 'https://placehold.co/100'} alt={row.name} className="w-12 h-12 rounded-lg object-cover bg-gray-100" />
+          <img src={row.images?.[0]?.image ? getMediaUrl(row.images[0].image) : 'https://placehold.co/100'} alt={row.name} className="w-12 h-12 rounded-lg object-cover bg-gray-100" />
           <div>
             <div className="font-bold text-black">{row.name}</div>
             <div className="text-xs text-gray-500 font-mono">{row.reference}</div>

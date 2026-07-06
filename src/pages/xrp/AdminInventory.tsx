@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Archive, AlertCircle } from 'lucide-react';
 import DataTable from '../../components/xrp/DataTable';
-import { ProductService } from '../../services/api';
+import { ProductService, getMediaUrl } from '../../services/api';
 
 export default function AdminInventory() {
   const [products, setProducts] = useState<any[]>([]);
@@ -20,7 +20,7 @@ export default function AdminInventory() {
       header: 'Produit', 
       accessor: (row: any) => (
         <div className="flex items-center gap-4">
-          <img src={row.images?.[0]?.image ? `http://localhost:3001${row.images[0].image}` : 'https://placehold.co/100'} alt={row.name} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
+          <img src={row.images?.[0]?.image ? getMediaUrl(row.images[0].image) : 'https://placehold.co/100'} alt={row.name} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
           <span className="font-bold text-black">{row.name}</span>
         </div>
       )

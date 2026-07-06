@@ -2,6 +2,13 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:3001/api' : '/api');
 
+export const getMediaUrl = (path: string) => {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  const baseUrl = import.meta.env.DEV ? 'http://localhost:3001' : '';
+  return `${baseUrl}${path}`;
+};
+
 export const api = axios.create({
   baseURL: API_URL,
 });
@@ -141,4 +148,10 @@ export const CustomerService = {
   getCustomers: () => api.get('/customers').then(res => res.data),
   updateCustomer: (id: string, data: any) => api.put(`/customers/${id}`, data).then(res => res.data),
   deleteCustomer: (id: string) => api.delete(`/customers/${id}`).then(res => res.data),
+};
+
+export const WishlistService = {
+  getWishlist: () => api.get('/wishlist').then(res => res.data),
+  addToWishlist: (productId: string) => api.post('/wishlist', { productId }).then(res => res.data),
+  removeFromWishlist: (productId: string) => api.delete(`/wishlist/${productId}`).then(res => res.data),
 };

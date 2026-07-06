@@ -632,6 +632,76 @@ app.delete('/api/orders/:id', async (req, res) => {
 });
 
 
+// --- WISHLIST ROUTES ---
+app.get('/api/wishlist', verifyCustomer, async (req: any, res) => {
+  try {
+    const wishlist = await prisma.wishlist.findMany({
+      where: { customerId: req.user.id },
+      include: {
+        product: {
+          include: {
+            images: { orderBy: { position: 'asc' } },
+            category: true,
+            variants: {
+              include: {
+                size: true,
+                color: true
+              }
+            }
+          }
+        }
+      }
+    });
+    res.json(wishlist);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch wishlist' });
+  }
+});
+
+app.post('/api/wishlist', verifyCustomer, async (req: any, res) => {
+  try {
+    const { productId } = req.body;
+    if (!productId) return res.status(400).json({ error: 'Product ID is required' });
+
+    const item = await prisma.wishlist.upsert({
+      where: {
+        customerId_productId: {
+          customerId: req.user.id,
+          productId
+        }
+      },
+      update: {},
+      create: {
+        customerId: req.user.id,
+        productId
+      }
+    });
+    res.json(item);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to add to wishlist' });
+  }
+});
+
+app.delete('/api/wishlist/:productId', verifyCustomer, async (req: any, res) => {
+  try {
+    const { productId } = req.params;
+    await prisma.wishlist.delete({
+      where: {
+        customerId_productId: {
+          customerId: req.user.id,
+          productId
+        }
+      }
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to remove from wishlist' });
+  }
+});
+
 // --- CUSTOMER ROUTES ---
 app.get('/api/customers', async (req, res) => {
   try {

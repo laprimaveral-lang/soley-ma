@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
+import { getMediaUrl } from '../services/api';
 
 export default function ProductCard({ id, name, price, salePrice, images = [], isNew, isBestSeller, variants = [] }: any) {
   const [isHovered, setIsHovered] = useState(false);
@@ -10,7 +11,7 @@ export default function ProductCard({ id, name, price, salePrice, images = [], i
   const sizes = Array.from(new Set(variants.map((v: any) => v.size?.value))).filter(Boolean);
   const colors = Array.from(new Map(variants.map((v: any) => [v.color?.id, v.color])).values()).filter(Boolean);
 
-  const mainImage = images.length > 0 ? `http://localhost:3001${images[0].image}` : '';
+  const mainImage = images.length > 0 ? getMediaUrl(images[0].image) : '';
   const promotion = salePrice && salePrice < price;
 
   return (
