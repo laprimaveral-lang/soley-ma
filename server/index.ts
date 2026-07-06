@@ -8,7 +8,16 @@ import 'dotenv/config';
 
 const app = express();
 
-const prisma = new PrismaClient();
+import { Pool } from 'pg';
+import { PrismaPg } from '@prisma/adapter-pg';
+
+const connectionString = process.env.DATABASE_URL || '';
+const pool = new Pool({ 
+  connectionString,
+  ssl: true
+});
+const adapter = new PrismaPg(pool as any);
+const prisma = new PrismaClient({ adapter });
 
 app.use(cors());
 app.use(express.json());
