@@ -5,6 +5,9 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import 'dotenv/config';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
 
 const app = express();
 
@@ -19,8 +22,37 @@ const pool = new Pool({
 const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
 
-app.use(cors());
-app.use(express.json());
+// Security headers
+app.use(helmet({
+  contentSecurityPolicy: false, // Géré par Nginx
+  crossOriginEmbedderPolicy: false
+}));
+
+// HTTP logs
+app.use(morgan('combined'));
+
+// CORS
+app.use(cors({ origin: ['https://soley.ma', 'http://31.220.94.217', 'http://localhost:5173'], credentials: true }));
+app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting global
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  message: { error: 'Trop de requêtes. Réessayez dans 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+app.use('/api/', globalLimiter);
+
+// Rate limiting strict pour l'authentification
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { error: 'Trop de tentatives de connexion. Réessayez dans 15 minutes.' }
+});
+app.use('/api/login', authLimiter);
+app.use('/api/auth/login', authLimiter);
 // Serve static files for uploads
 app.use('/assets/products', express.static(path.join(__dirname, '../public/assets/products')));
 

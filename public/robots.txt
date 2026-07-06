@@ -1,4 +1,20 @@
 User-agent: *
 Allow: /
 
+# Interdire les pages admin
+Disallow: /xrp/
+Disallow: /xrp
+
+# Interdire les pages sensibles
+Disallow: /cart
+Disallow: /checkout
+Disallow: /login
+Disallow: /register
+Disallow: /account
+Disallow: /api/
+
+# Autoriser les collections et produits
+Allow: /collections/
+Allow: /product/
+
 Sitemap: https://soley.ma/sitemap.xml

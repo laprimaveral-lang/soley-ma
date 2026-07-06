@@ -6,12 +6,37 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://soley.ma/about</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <loc>https://soley.ma/collections/nouveau</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://soley.ma/contact</loc>
+    <loc>https://soley.ma/collections/sandales</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://soley.ma/collections/mules</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://soley.ma/collections/sabots</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://soley.ma/collections/mocassins</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://soley.ma/collections/slippers</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://soley.ma/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -21,18 +46,8 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://soley.ma/returns</loc>
+    <loc>https://soley.ma/delivery</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://soley.ma/privacy</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://soley.ma/terms</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
 </urlset>
