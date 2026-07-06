@@ -85,8 +85,8 @@ async function runTests() {
 
   // 7. Test Admin Login
   const adminRes = await assert('Admin Login', axios.post(`${API_URL}/login`, {
-    username: 'admin',
-    password: 'password'
+    email: 'laprimaveral@gmail.com',
+    password: 'B@51275ua'
   }));
 
   if (adminRes && adminRes.token) {
