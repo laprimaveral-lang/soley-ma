@@ -26,7 +26,7 @@ export default function Header() {
       </div>
       <div className="container mx-auto px-6 lg:px-12 py-4 flex justify-between items-center relative max-w-[1400px]">
         <Link to="/" className="flex-1 flex justify-start hover:opacity-70 transition-opacity">
-          <img src="/logo.png" alt="Soley" className="h-32 md:h-36 w-auto object-contain" />
+          <img src="/logo.png?v=2" alt="Soley" className="h-32 md:h-36 w-auto object-contain" />
         </Link>
         <div className="flex justify-end items-center space-x-8 text-black">
           {isSearchOpen ? (
