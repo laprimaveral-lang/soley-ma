@@ -22,8 +22,10 @@ conn.on('ready', () => {
     npx prisma generate
     npm run build
     
-    echo "=== [4/5] Restarting PM2 ==="
-    pm2 restart soley --update-env
+    echo "=== [4/5] Restarting PM2 with config ==="
+    pm2 delete soley || true
+    pm2 start ecosystem.config.cjs
+    pm2 save
     
     echo "=== [5/5] Reloading Nginx ==="
     nginx -t
