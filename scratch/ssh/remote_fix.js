@@ -23,6 +23,7 @@ conn.on('ready', () => {
     npm run build
     
     echo "=== [4/5] Restarting PM2 with config ==="
+    cd /var/www/soley
     pm2 delete soley || true
     pm2 start ecosystem.config.cjs
     pm2 save
