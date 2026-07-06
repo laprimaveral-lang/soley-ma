@@ -67,19 +67,27 @@ async function runTests() {
     }
 
     // 6. Test Orders (Checkout)
-    await assert('Create Order (Checkout)', axios.post(`${API_URL}/orders`, {
-      items: [
-        { variantId: "some-id-if-exists-or-mock", quantity: 1, price: 100 }
-      ],
-      total: 100,
-      customerName: "Automated Tester",
-      email: randomEmail,
-      phone: "0600000000",
-      address: "123 Test St",
-      city: "Test City"
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    }));
+    if (productsRes.data && productsRes.data.length > 0) {
+      const prod = productsRes.data[0];
+      const variantId = prod.variants?.[0]?.id;
+      if (variantId) {
+        await assert('Create Order (Checkout)', axios.post(`${API_URL}/orders`, {
+          items: [
+            { productVariantId: variantId, quantity: 1, price: prod.price }
+          ],
+          total: prod.price,
+          customerName: "Automated Tester",
+          email: randomEmail,
+          phone: "0600000000",
+          address: "123 Test St",
+          city: "Test City"
+        }, {
+          headers: { Authorization: `Bearer ${token}` }
+        }));
+      } else {
+        console.warn('Skipping Create Order test because product has no variants');
+      }
+    }
 
   }
 

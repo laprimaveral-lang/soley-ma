@@ -7,7 +7,7 @@ import 'dotenv/config';
 const connectionString = process.env.DATABASE_URL || '';
 const pool = new Pool({ 
   connectionString,
-  ssl: true
+  ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false }
 });
 const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
