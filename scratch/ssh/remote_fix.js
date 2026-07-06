@@ -2,7 +2,7 @@ const { Client } = require('ssh2');
 
 const conn = new Client();
 conn.on('ready', () => {
-  console.log('SSH Connected - Deploying full production build');
+  console.log('SSH Connected - Deploying updates with database indexes');
   conn.exec(`
     set -e
     cd /var/www/soley
@@ -15,12 +15,14 @@ conn.on('ready', () => {
     npm install
     npm run build
     
-    echo "=== [3/5] Building backend + installing security packages ==="
+    echo "=== [3/5] Syncing database schema indexes & generating client ==="
     cd server
     npm install
+    npx prisma db push
+    npx prisma generate
     npm run build
     
-    echo "=== [4/5] Restarting PM2 with updated env ==="
+    echo "=== [4/5] Restarting PM2 ==="
     pm2 restart soley --update-env
     
     echo "=== [5/5] Reloading Nginx ==="
@@ -35,12 +37,6 @@ conn.on('ready', () => {
     
     echo "--- API ---"
     curl -s -I http://127.0.0.1/api/products
-    
-    echo "--- robots.txt ---"
-    curl -s http://127.0.0.1/robots.txt
-    
-    echo "--- sitemap.xml check ---"
-    curl -s -I http://127.0.0.1/sitemap.xml | grep -E 'HTTP|Content-Type'
     
     echo "=== PM2 STATUS ==="
     pm2 status
