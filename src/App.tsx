@@ -26,7 +26,10 @@ const AdminInventory = lazy(() => import('./pages/xrp/AdminInventory'));
 const AdminBanners = lazy(() => import('./pages/xrp/AdminBanners'));
 const AdminCoupons = lazy(() => import('./pages/xrp/AdminCoupons'));
 const AdminSettings = lazy(() => import('./pages/xrp/AdminSettings'));
-const StaticPages = lazy(() => import('./pages/StaticPages'));
+const StaticPages = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.About })));
+const FAQPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.FAQ })));
+const DeliveryPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.DeliveryReturns })));
+const NotFoundPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.NotFound })));
 
 // Composant de chargement élégant
 function PageLoader() {
@@ -57,9 +60,9 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="account/*" element={<Account />} />
             <Route path="about" element={<StaticPages />} />
-            <Route path="faq" element={<StaticPages />} />
-            <Route path="delivery" element={<StaticPages />} />
-            <Route path="*" element={<StaticPages />} />
+            <Route path="faq" element={<FAQPage />} />
+            <Route path="delivery" element={<DeliveryPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           <Route path="/xrp" element={<ProtectedRoute />}>
