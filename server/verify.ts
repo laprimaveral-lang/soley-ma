@@ -100,7 +100,7 @@ async function runTests() {
   if (adminRes && adminRes.token) {
     const adminToken = adminRes.token;
     // 8. Test Admin Protected Endpoint
-    await assert('Admin Get Orders', axios.get(`${API_URL}/admin/orders`, {
+    await assert('Admin Get Orders', axios.get(`${API_URL}/orders`, {
       headers: { Authorization: `Bearer ${adminToken}` }
     }));
   }
