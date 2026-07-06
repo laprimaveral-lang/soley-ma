@@ -25,10 +25,14 @@ export default function Header() {
         OFFRE LIMITÉE : 2 ACHETÉS = LA 3ÈME GRATUITE
       </div>
       <div className="container mx-auto px-6 lg:px-12 py-4 flex justify-between items-center relative max-w-[1400px]">
-        <Link to="/" className="flex-1 flex justify-start hover:opacity-70 transition-opacity">
-          <img src="/logo.png?v=2" alt="Soley" className="h-32 md:h-36 w-auto object-contain" />
+        {/* Espacement gauche pour centrer le logo */}
+        <div className="flex-1"></div>
+        
+        <Link to="/" className="flex-shrink-0 flex justify-center hover:opacity-70 transition-opacity">
+          <img src="/logo.png?v=3" alt="Soley" className="h-32 md:h-36 w-auto object-contain mix-blend-multiply" />
         </Link>
-        <div className="flex justify-end items-center space-x-8 text-black">
+        
+        <div className="flex-1 flex justify-end items-center space-x-8 text-black">
           {isSearchOpen ? (
             <form onSubmit={handleSearch} className="absolute inset-y-0 right-12 flex items-center bg-transparent z-10 w-full max-w-sm px-4">
               <input 
