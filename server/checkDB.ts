@@ -3,7 +3,10 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 const connectionString = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/soley';
-const pool = new Pool({ connectionString, ssl: true });
+const pool = new Pool({ 
+  connectionString, 
+  ssl: connectionString.includes('localhost') ? false : { rejectUnauthorized: false } 
+});
 const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
 
