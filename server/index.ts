@@ -690,6 +690,21 @@ app.post('/api/orders', async (req, res) => {
   try {
     const { items, customerId, customerName, customerPhone, shippingAddress, subtotal, total, shipping, discount } = req.body;
 
+    // Check if customer is blacklisted by phone, email, or ID
+    const blacklistedUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          customerPhone ? { phone: customerPhone, isBlacklisted: true } : undefined,
+          req.body.email ? { email: req.body.email, isBlacklisted: true } : undefined,
+          customerId ? { id: customerId, isBlacklisted: true } : undefined
+        ].filter(Boolean) as any
+      }
+    });
+
+    if (blacklistedUser) {
+      return res.status(400).json({ error: "Commande refusée : Ce numéro ou cet email est associé à des retours abusifs répétés." });
+    }
+
     const orderItemsToCreate = [];
     for (const item of items) {
       // Find matching variant based on product ID, color, and size

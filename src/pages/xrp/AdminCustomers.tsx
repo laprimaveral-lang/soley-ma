@@ -10,8 +10,8 @@ export default function AdminCustomers() {
   const [editingCustomer, setEditingCustomer] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({ name: '', phone: '' });
-
+  const [formData, setFormData] = useState({ name: '', phone: '', isBlacklisted: false });
+  
   useEffect(() => {
     fetchCustomers();
   }, []);
@@ -23,7 +23,11 @@ export default function AdminCustomers() {
 
   const handleOpenModal = (customer: any) => {
     setEditingCustomer(customer);
-    setFormData({ name: customer.name, phone: customer.phone || '' });
+    setFormData({ 
+      name: customer.name, 
+      phone: customer.phone || '',
+      isBlacklisted: customer.isBlacklisted || false
+    });
     setIsModalOpen(true);
   };
 
@@ -52,7 +56,12 @@ export default function AdminCustomers() {
             {row.name.charAt(0).toUpperCase()}
           </div>
           <div>
-            <div className="font-bold text-black">{row.name}</div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-black">{row.name}</span>
+              {row.isBlacklisted && (
+                <span className="bg-red-100 text-red-700 text-[10px] px-2.5 py-0.5 rounded-full font-extrabold border border-red-200 uppercase tracking-widest animate-pulse">Liste Noire</span>
+              )}
+            </div>
             <div className="text-sm text-gray-500">{row.email}</div>
           </div>
         </div>
@@ -120,6 +129,18 @@ export default function AdminCustomers() {
                   onChange={e => setFormData({ ...formData, phone: e.target.value })}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" 
                 />
+              </div>
+              <div className="flex items-center gap-3 py-2">
+                <input 
+                  type="checkbox" 
+                  id="isBlacklisted"
+                  checked={formData.isBlacklisted}
+                  onChange={e => setFormData({ ...formData, isBlacklisted: e.target.checked })}
+                  className="w-4 h-4 border-gray-300 text-red-600 focus:ring-red-500 rounded" 
+                />
+                <label htmlFor="isBlacklisted" className="text-sm font-bold text-red-600 select-none cursor-pointer">
+                  Placer ce client en liste noire
+                </label>
               </div>
               <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-100">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50">Annuler</button>

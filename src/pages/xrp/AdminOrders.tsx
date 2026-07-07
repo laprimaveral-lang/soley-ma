@@ -60,7 +60,17 @@ export default function AdminOrders() {
     },
     { 
       header: 'Client', 
-      accessor: (row: any) => row.customerName || row.customer?.name || 'Inconnu'
+      accessor: (row: any) => (
+        <div>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-gray-900">{row.customerName || row.customer?.name || 'Inconnu'}</span>
+            {row.customer?.isBlacklisted && (
+              <span className="bg-red-100 text-red-700 text-[9px] px-2 py-0.5 rounded-full font-extrabold border border-red-200 uppercase tracking-widest animate-pulse">Liste Noire</span>
+            )}
+          </div>
+          {row.customerPhone && <span className="block text-xs text-gray-500 mt-0.5">{row.customerPhone}</span>}
+        </div>
+      )
     },
     { 
       header: 'Date', 
