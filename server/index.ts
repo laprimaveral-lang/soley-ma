@@ -69,7 +69,10 @@ app.use('/api/auth/login', authLimiter);
 app.use('/assets/products', express.static(path.join(__dirname, '../public/assets/products')));
 
 // Setup uploads directory
-const uploadDir = path.join(__dirname, '../public/assets/products');
+const uploadDir = process.platform === 'win32'
+  ? path.join(__dirname, '../public/assets/products')
+  : '/var/www/soley/public/assets/products';
+
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
