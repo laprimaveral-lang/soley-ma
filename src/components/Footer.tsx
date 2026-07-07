@@ -162,7 +162,7 @@ export default function Footer() {
         <div className="flex flex-col items-center">
           <div className="flex flex-wrap justify-center gap-6 md:gap-8 mb-12">
             {/* Instagram */}
-            <a href="#" target="_blank" rel="noreferrer" aria-label="Instagram"
+            <a href="https://www.instagram.com/soley_shoes_/" target="_blank" rel="noreferrer" aria-label="Instagram"
               className="group flex flex-col items-center gap-2 hover:opacity-60 transition-opacity">
               <div className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center group-hover:border-black transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="w-4.5 h-4.5">
