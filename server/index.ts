@@ -44,7 +44,8 @@ app.use(morgan('combined'));
 
 // CORS
 app.use(cors({ origin: ['https://soley.ma', 'http://31.220.94.217', 'http://localhost:5173'], credentials: true }));
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
 // Rate limiting global
 const globalLimiter = rateLimit({
@@ -77,7 +78,10 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`)
 });
-const upload = multer({ storage });
+const upload = multer({ 
+  storage, 
+  limits: { fileSize: 20 * 1024 * 1024 } 
+});
 
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
