@@ -15,6 +15,7 @@ conn.on('ready', () => {
     
     echo "=== [3/4] Rebuilding Backend ==="
     cd server
+    npx prisma generate
     npm run build
     
     echo "=== [4/4] Restarting PM2 process ==="

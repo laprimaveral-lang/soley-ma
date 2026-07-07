@@ -18,7 +18,8 @@ export default function AdminProducts() {
   const [formData, setFormData] = useState({
     name: '', reference: '', slug: '', description: '', categoryId: '', 
     price: '' as any, salePrice: '', costPrice: '' as any, videoUrl: '', stock: '' as any, status: 'draft', images: [] as string[],
-    colorIds: [] as string[], sizeIds: [] as string[]
+    colorIds: [] as string[], sizeIds: [] as string[],
+    barcode: '', brand: '', location: '', minStock: '0' as any, tva: '20' as any
   });
 
   useEffect(() => {
@@ -108,14 +109,20 @@ export default function AdminProducts() {
         status: product.status,
         images: product.images?.map((i: any) => i.image) || [],
         colorIds: Array.from(new Set(product.variants?.map((v: any) => v.colorId).filter(Boolean))) as string[],
-        sizeIds: Array.from(new Set(product.variants?.map((v: any) => v.sizeId).filter(Boolean))) as string[]
+        sizeIds: Array.from(new Set(product.variants?.map((v: any) => v.sizeId).filter(Boolean))) as string[],
+        barcode: product.barcode || '',
+        brand: product.brand || '',
+        location: product.location || '',
+        minStock: product.minStock ?? 0,
+        tva: product.tva ?? 20
       });
     } else {
       setEditingProduct(null);
       setFormData({
         name: '', reference: '', slug: '', description: '', categoryId: categories[0]?.id || '', 
         price: '', salePrice: '', costPrice: '', videoUrl: '', stock: '', status: 'draft', images: [],
-        colorIds: [], sizeIds: []
+        colorIds: [], sizeIds: [],
+        barcode: '', brand: '', location: '', minStock: 0, tva: 20
       });
     }
     setIsModalOpen(true);
@@ -141,7 +148,12 @@ export default function AdminProducts() {
         create: formData.images.map((img, idx) => ({ image: img, position: idx }))
       },
       colorIds: formData.colorIds,
-      sizeIds: formData.sizeIds
+      sizeIds: formData.sizeIds,
+      barcode: formData.barcode || '',
+      brand: formData.brand || '',
+      location: formData.location || '',
+      minStock: Number(formData.minStock || 0),
+      tva: Number(formData.tva || 20)
     };
 
     try {
@@ -297,8 +309,33 @@ export default function AdminProducts() {
                   <input type="number" value={formData.salePrice} onChange={e => setFormData({...formData, salePrice: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Prix d'Achat (MAD)</label>
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="block text-sm font-bold text-gray-700">Prix d'Achat (MAD)</label>
+                    <span className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded font-extrabold border border-green-200">
+                      Marge : {Number(formData.price) > 0 ? (((Number(formData.price) - Number(formData.costPrice || 0)) / Number(formData.price)) * 100).toFixed(0) : '0'}%
+                    </span>
+                  </div>
                   <input type="number" value={formData.costPrice} onChange={e => setFormData({...formData, costPrice: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
+                </div>
+              </div>
+
+              {/* ERP Stock & Logistique Spécifique */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Code Barre (EAN)</label>
+                  <input type="text" value={formData.barcode} onChange={e => setFormData({...formData, barcode: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-xs bg-white" placeholder="Ex: 6111234567890" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Marque</label>
+                  <input type="text" value={formData.brand} onChange={e => setFormData({...formData, brand: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-xs bg-white" placeholder="Ex: Soley Premium" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Emplacement Stock</label>
+                  <input type="text" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-xs bg-white" placeholder="Ex: Rayon A-4" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">TVA (%)</label>
+                  <input type="number" value={formData.tva} onChange={e => setFormData({...formData, tva: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-xs bg-white" />
                 </div>
               </div>
 
@@ -309,10 +346,14 @@ export default function AdminProducts() {
               </div>
 
               {/* Stock & Statut */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Stock total</label>
                   <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" required />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Alerte Stock Minimum</label>
+                  <input type="number" value={formData.minStock} onChange={e => setFormData({...formData, minStock: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Statut</label>
