@@ -895,7 +895,10 @@ app.delete('/api/wishlist/:productId', verifyCustomer, async (req: any, res) => 
 // --- CUSTOMER ROUTES ---
 app.get('/api/customers', verifyAdmin, async (req: any, res) => {
   try {
-    const customers = await prisma.user.findMany({ where: { role: 'customer' } });
+    const customers = await prisma.user.findMany({ 
+      where: { role: 'customer' },
+      include: { orders: true }
+    });
     res.json(customers);
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch customers' });

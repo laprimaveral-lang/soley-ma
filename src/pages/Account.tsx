@@ -11,6 +11,7 @@ import NotificationsView from './account/NotificationsView';
 import StoreCreditView from './account/StoreCreditView';
 import ReturnsView from './account/ReturnsView';
 import SupportView from './account/SupportView';
+import LoyaltyView from './account/LoyaltyView';
 
 export default function Account() {
   const { isAuthenticated } = useCustomerAuth();
@@ -26,6 +27,7 @@ export default function Account() {
         <Route path="orders" element={<OrdersView />} />
         <Route path="addresses" element={<AddressesView />} />
         <Route path="wishlist" element={<WishlistView />} />
+        <Route path="loyalty" element={<LoyaltyView />} />
         <Route path="personal-info" element={<PersonalInfoView />} />
         <Route path="security" element={<SecurityView />} />
         <Route path="notifications" element={<NotificationsView />} />

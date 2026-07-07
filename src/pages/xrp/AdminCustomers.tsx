@@ -72,6 +72,27 @@ export default function AdminCustomers() {
       accessor: (row: any) => row.phone || 'Non renseigné'
     },
     { 
+      header: 'Fidélité', 
+      accessor: (row: any) => {
+        const orderCount = row.orders?.length || 0;
+        const stars = Math.min(5, orderCount);
+        return (
+          <div className="flex flex-col gap-1 font-sans">
+            <div className="flex text-amber-400 text-lg">
+              {Array.from({ length: 5 }).map((_, idx) => (
+                <span key={idx} className={idx < stars ? 'opacity-100' : 'opacity-20'}>★</span>
+              ))}
+            </div>
+            {stars >= 5 ? (
+              <span className="text-[9px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 w-fit uppercase tracking-wider animate-pulse">VIP 5★ (Remise)</span>
+            ) : (
+              <span className="text-[9px] font-semibold text-gray-500">{orderCount} achat(s)</span>
+            )}
+          </div>
+        );
+      }
+    },
+    { 
       header: 'Inscription', 
       accessor: (row: any) => new Date(row.createdAt).toLocaleDateString('fr-FR')
     },

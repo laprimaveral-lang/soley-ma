@@ -4,6 +4,7 @@ import {
   Package, 
   MapPin, 
   Heart, 
+  Award,
   LogOut 
 } from 'lucide-react';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
@@ -14,6 +15,7 @@ const NAV_ITEMS = [
   { path: '/account/orders', label: 'Mes commandes', icon: Package },
   { path: '/account/addresses', label: 'Mes adresses', icon: MapPin },
   { path: '/account/wishlist', label: 'Ma wishlist', icon: Heart },
+  { path: '/account/loyalty', label: 'Fidélité & Remises', icon: Award },
 ];
 
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
