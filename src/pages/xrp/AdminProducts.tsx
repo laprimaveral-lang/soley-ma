@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Package } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, Download, Upload } from 'lucide-react';
 import DataTable from '../../components/xrp/DataTable';
 import ConfirmDialog from '../../components/xrp/ConfirmDialog';
 import ImageUploader from '../../components/xrp/ImageUploader';
@@ -17,7 +17,7 @@ export default function AdminProducts() {
 
   const [formData, setFormData] = useState({
     name: '', reference: '', slug: '', description: '', categoryId: '', 
-    price: 0, salePrice: '', stock: 0, status: 'draft', images: [] as string[],
+    price: 0, salePrice: '', costPrice: 0, videoUrl: '', stock: 0, status: 'draft', images: [] as string[],
     colorIds: [] as string[], sizeIds: [] as string[]
   });
 
@@ -38,6 +38,59 @@ export default function AdminProducts() {
     setSizes(sizeRes);
   };
 
+  const handleExportCSV = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/admin/products/export', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'export_soley_produits.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (err) {
+      console.error(err);
+      alert('Erreur lors de l\'exportation CSV.');
+    }
+  };
+
+  const handleImportCSV = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const csvText = event.target?.result as string;
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/admin/products/import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ csvText })
+        });
+        const resData = await response.json();
+        if (response.ok) {
+          alert(`Importation réussie ! ${resData.count} produits importés ou mis à jour.`);
+          fetchData();
+        } else {
+          alert(`Erreur d'importation: ${resData.error}`);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Erreur lors de l\'importation CSV.');
+      }
+    };
+    reader.readAsText(file);
+  };
+
   const handleOpenModal = (product: any = null) => {
     if (product) {
       setEditingProduct(product);
@@ -49,6 +102,8 @@ export default function AdminProducts() {
         categoryId: product.categoryId || '',
         price: product.price,
         salePrice: product.salePrice || '',
+        costPrice: product.costPrice || 0,
+        videoUrl: product.videoUrl || '',
         stock: product.stock,
         status: product.status,
         images: product.images?.map((i: any) => i.image) || [],
@@ -59,7 +114,7 @@ export default function AdminProducts() {
       setEditingProduct(null);
       setFormData({
         name: '', reference: '', slug: '', description: '', categoryId: categories[0]?.id || '', 
-        price: 0, salePrice: '', stock: 0, status: 'draft', images: [],
+        price: 0, salePrice: '', costPrice: 0, videoUrl: '', stock: 0, status: 'draft', images: [],
         colorIds: [], sizeIds: []
       });
     }
@@ -79,6 +134,8 @@ export default function AdminProducts() {
       ...formData,
       price: Number(formData.price),
       salePrice: formData.salePrice ? Number(formData.salePrice) : null,
+      costPrice: Number(formData.costPrice || 0),
+      videoUrl: formData.videoUrl || '',
       stock: Number(formData.stock),
       images: {
         create: formData.images.map((img, idx) => ({ image: img, position: idx }))
@@ -166,12 +223,31 @@ export default function AdminProducts() {
           </h1>
           <p className="text-gray-500 mt-1">Gérez votre catalogue de produits, les prix et le stock.</p>
         </div>
-        <button type="button" 
-          onClick={() => handleOpenModal()}
-          className="bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-800 transition-colors"
-        >
-          <Plus size={20} /> Ajouter un produit
-        </button>
+        <div className="flex gap-4">
+          <button type="button" 
+            onClick={handleExportCSV}
+            className="border border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-50 transition-colors text-sm"
+          >
+            <Download size={20} /> Exporter
+          </button>
+          
+          <label className="border border-gray-300 text-gray-700 px-4 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-50 transition-colors cursor-pointer text-sm">
+            <Upload size={20} /> Importer
+            <input 
+              type="file" 
+              accept=".csv" 
+              onChange={handleImportCSV} 
+              className="hidden" 
+            />
+          </label>
+
+          <button type="button" 
+            onClick={() => handleOpenModal()}
+            className="bg-black text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 hover:bg-gray-800 transition-colors text-sm"
+          >
+            <Plus size={20} /> Ajouter un produit
+          </button>
+        </div>
       </div>
 
       <DataTable data={products} columns={columns} searchable searchPlaceholder="Rechercher par nom, référence..." />
@@ -199,22 +275,32 @@ export default function AdminProducts() {
               </div>
 
               {/* Catégorie & Prix */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Catégorie</label>
-                  <select value={formData.categoryId} onChange={e => setFormData({...formData, categoryId: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" required>
+                  <select value={formData.categoryId} onChange={e => setFormData({...formData, categoryId: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" required>
                     <option value="">Sélectionner...</option>
                     {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Prix régulier (MAD)</label>
-                  <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.valueAsNumber})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" required />
+                  <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.valueAsNumber})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" required />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Prix promo (MAD)</label>
-                  <input type="number" value={formData.salePrice} onChange={e => setFormData({...formData, salePrice: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" />
+                  <input type="number" value={formData.salePrice} onChange={e => setFormData({...formData, salePrice: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
                 </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Prix d'Achat (MAD)</label>
+                  <input type="number" value={formData.costPrice} onChange={e => setFormData({...formData, costPrice: e.target.valueAsNumber})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
+                </div>
+              </div>
+
+              {/* Vidéo de démonstration */}
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">URL de la Vidéo (YouTube / MP4)</label>
+                <input type="text" placeholder="https://www.youtube.com/watch?v=..." value={formData.videoUrl} onChange={e => setFormData({...formData, videoUrl: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
               </div>
 
               {/* Stock & Statut */}

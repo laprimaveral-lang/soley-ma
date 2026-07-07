@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { OrderService, getMediaUrl } from '../../services/api';
 import { Download, RefreshCw } from 'lucide-react';
 
@@ -85,9 +86,12 @@ export default function OrdersView() {
               </div>
 
               <div className="flex flex-wrap gap-4 pt-6 border-t border-[#ECECEC]">
-                <button className="flex items-center gap-2 px-6 py-3 border border-black text-[10px] font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-colors">
+                <Link 
+                  to={`/account/orders/${order.id}/invoice`}
+                  className="flex items-center gap-2 px-6 py-3 border border-black text-[10px] font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-colors"
+                >
                   <Download className="w-4 h-4 stroke-[1.5]" /> Facture
-                </button>
+                </Link>
                 <button className="flex items-center gap-2 px-6 py-3 bg-black text-white text-[10px] font-bold tracking-widest uppercase hover:opacity-70 transition-opacity">
                   <RefreshCw className="w-4 h-4 stroke-[1.5]" /> Recommander
                 </button>

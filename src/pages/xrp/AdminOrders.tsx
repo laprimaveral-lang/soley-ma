@@ -10,7 +10,12 @@ export default function AdminOrders() {
   const [editingOrder, setEditingOrder] = useState<any>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState({ status: 'pending' });
+  const [formData, setFormData] = useState({ 
+    status: 'pending',
+    trackingCode: '',
+    carrier: '',
+    shippingStatus: 'preparing'
+  });
 
   useEffect(() => {
     fetchOrders();
@@ -23,7 +28,12 @@ export default function AdminOrders() {
 
   const handleOpenModal = (order: any) => {
     setEditingOrder(order);
-    setFormData({ status: order.status });
+    setFormData({ 
+      status: order.status || 'pending',
+      trackingCode: order.trackingCode || '',
+      carrier: order.carrier || '',
+      shippingStatus: order.shippingStatus || 'preparing'
+    });
     setIsModalOpen(true);
   };
 
@@ -50,7 +60,7 @@ export default function AdminOrders() {
     },
     { 
       header: 'Client', 
-      accessor: (row: any) => row.customer?.name || 'Inconnu'
+      accessor: (row: any) => row.customerName || row.customer?.name || 'Inconnu'
     },
     { 
       header: 'Date', 
@@ -59,6 +69,21 @@ export default function AdminOrders() {
     { 
       header: 'Total', 
       accessor: (row: any) => <span className="font-bold">{row.total} MAD</span>
+    },
+    { 
+      header: 'Suivi', 
+      accessor: (row: any) => (
+        <div className="text-xs">
+          {row.trackingCode ? (
+            <div>
+              <span className="font-bold uppercase text-gray-700">{row.carrier}</span>
+              <span className="block text-gray-500 font-mono">{row.trackingCode}</span>
+            </div>
+          ) : (
+            <span className="text-gray-400 font-light">-</span>
+          )}
+        </div>
+      )
     },
     { 
       header: 'Statut', 
@@ -114,15 +139,15 @@ export default function AdminOrders() {
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-sm p-8">
-            <h2 className="text-2xl font-bold mb-6">Mettre à jour le statut</h2>
+          <div className="bg-white rounded-2xl w-full max-w-sm p-8 max-h-[90vh] overflow-y-auto font-sans">
+            <h2 className="text-2xl font-bold mb-6">Mettre à jour la commande</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Statut de la commande</label>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Statut global</label>
                 <select 
                   value={formData.status}
-                  onChange={e => setFormData({ status: e.target.value })}
-                  className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none"
+                  onChange={e => setFormData({ ...formData, status: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm"
                 >
                   <option value="pending">En attente</option>
                   <option value="processing">En cours de traitement</option>
@@ -131,9 +156,46 @@ export default function AdminOrders() {
                   <option value="cancelled">Annulée</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Transporteur (Carrier)</label>
+                <input 
+                  type="text"
+                  placeholder="Ex: AMANA, Standard..."
+                  value={formData.carrier}
+                  onChange={e => setFormData({ ...formData, carrier: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Code de suivi (Tracking Code)</label>
+                <input 
+                  type="text"
+                  placeholder="Ex: AM123456789MA"
+                  value={formData.trackingCode}
+                  onChange={e => setFormData({ ...formData, trackingCode: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Statut livraison</label>
+                <select 
+                  value={formData.shippingStatus}
+                  onChange={e => setFormData({ ...formData, shippingStatus: e.target.value })}
+                  className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm"
+                >
+                  <option value="preparing">En préparation</option>
+                  <option value="in_transit">En transit</option>
+                  <option value="delivered">Livrée</option>
+                  <option value="returned">Retournée</option>
+                </select>
+              </div>
+
               <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-100">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50">Annuler</button>
-                <button type="submit" className="px-6 py-2 bg-black text-white rounded-lg font-bold hover:bg-gray-800">Sauvegarder</button>
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2 border border-gray-200 rounded-lg font-bold hover:bg-gray-50 text-sm">Annuler</button>
+                <button type="submit" className="px-6 py-2 bg-black text-white rounded-lg font-bold hover:bg-gray-800 text-sm">Sauvegarder</button>
               </div>
             </form>
           </div>

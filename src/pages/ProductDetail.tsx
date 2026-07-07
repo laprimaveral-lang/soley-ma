@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Truck, ChevronRight, Check } from 'lucide-react';
+import { Heart, ShoppingBag, Truck, ChevronRight, Check, Play, Star, X } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useCart } from '../context/CartContext';
-import { ProductService, OrderService, getMediaUrl } from '../services/api';
+import { ProductService, OrderService, ReviewService, getMediaUrl } from '../services/api';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -20,6 +20,19 @@ export default function ProductDetail() {
   const [mainImage, setMainImage] = useState<string>('');
   const { addToCart } = useCart();
 
+  // Image Zoom & Video states
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [isZoomed, setIsZoomed] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  // Recently Viewed & Reviews states
+  const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [newRating, setNewRating] = useState(5);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
   // Checkout Modal State
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [selectedOffer, setSelectedOffer] = useState<'single' | 'pack'>('single');
@@ -34,6 +47,15 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setLoading(true);
+    
+    // Check login status
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+
+    // Get recently viewed list
+    const localRecentlyViewed = JSON.parse(localStorage.getItem('recentlyViewed') || '[]');
+    setRecentlyViewed(localRecentlyViewed);
+
     ProductService.getProducts().then(products => {
       setAllProducts(products);
       const foundProduct = products.find((p: any) => p.id === id || p.slug === id) || products[0];
@@ -52,12 +74,55 @@ export default function ProductDetail() {
           { productId: foundProduct.id, colorId: '', size: '' },
           { productId: foundProduct.id, colorId: '', size: '' }
         ]);
+
+        // Save to recently viewed
+        const currentItem = {
+          id: foundProduct.id,
+          name: foundProduct.name,
+          price: foundProduct.price,
+          salePrice: foundProduct.salePrice,
+          slug: foundProduct.slug,
+          images: foundProduct.images
+        };
+        const updatedRecently = [currentItem, ...localRecentlyViewed.filter((item: any) => item.id !== foundProduct.id)].slice(0, 5);
+        localStorage.setItem('recentlyViewed', JSON.stringify(updatedRecently));
+        setRecentlyViewed(updatedRecently);
+
+        // Fetch reviews
+        ReviewService.getReviews(foundProduct.id)
+          .then(res => setReviews(res))
+          .catch(err => console.error('Failed to load reviews:', err));
       }
       const related = products.filter((p: any) => p.categoryId === foundProduct?.categoryId && p.id !== foundProduct?.id).slice(0, 4);
       setRelatedProducts(related);
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [id]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setZoomPos({ x, y });
+  };
+
+  const handleAddReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newComment.trim()) return;
+    setIsSubmittingReview(true);
+    try {
+      await ReviewService.createReview(product.id, newRating, newComment);
+      const updated = await ReviewService.getReviews(product.id);
+      setReviews(updated);
+      setNewComment('');
+      setNewRating(5);
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de l'ajout de l'avis.");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const handleAddToCart = () => {
     const colors = Array.from(new Map(product.variants?.map((v: any) => [v.color?.id, v.color])).values()).filter(Boolean) as any[];
@@ -199,11 +264,33 @@ export default function ProductDetail() {
                   ))}
                 </div>
                 {/* Main Image */}
-                <div className="flex-1 bg-[#F5F5F0] aspect-[3/4] md:aspect-[4/5] relative overflow-hidden cursor-zoom-in">
-                  <img src={mainImage} className="w-full h-full object-cover hover:scale-105 transition-transform duration-[2s] ease-[0.25,0.1,0.25,1]" alt={product.name} />
+                <div 
+                  onMouseMove={handleMouseMove}
+                  onMouseEnter={() => setIsZoomed(true)}
+                  onMouseLeave={() => setIsZoomed(false)}
+                  className="flex-1 bg-[#F5F5F0] aspect-[3/4] md:aspect-[4/5] relative overflow-hidden cursor-zoom-in"
+                >
+                  <img 
+                    src={mainImage} 
+                    style={{
+                      transform: isZoomed ? 'scale(2)' : 'scale(1)',
+                      transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,
+                    }}
+                    className="w-full h-full object-cover transition-transform duration-100 ease-out" 
+                    alt={product.name} 
+                  />
                   <div className="absolute top-6 left-6 flex gap-3">
                     {product.isNew && <span className="bg-black text-white px-4 py-2 text-[10px] font-bold tracking-widest uppercase">Nouveau</span>}
                   </div>
+                  {product.videoUrl && (
+                    <button 
+                      onClick={() => setIsVideoModalOpen(true)}
+                      className="absolute bottom-6 right-6 bg-white hover:bg-black hover:text-white text-black p-3.5 rounded-full shadow-lg transition-colors flex items-center justify-center"
+                      title="Regarder la vidéo"
+                    >
+                      <Play className="w-4 h-4 fill-current ml-0.5" />
+                    </button>
+                  )}
                 </div>
               </>
             ) : (
@@ -385,7 +472,181 @@ export default function ProductDetail() {
           </div>
         </div>
 
+        {/* Recently Viewed Products */}
+        {recentlyViewed.length > 1 && (
+          <div className="mt-32 pt-20 border-t border-[#ECECEC]">
+            <h2 className="text-xl lg:text-3xl font-serif text-center mb-16 text-black">Produits consultés récemment</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {recentlyViewed
+                .filter((p: any) => p.id !== product.id)
+                .map((p: any) => (
+                  <div key={p.id} className="group relative">
+                    <Link to={`/products/${p.slug}`}>
+                      <div className="aspect-[3/4] bg-[#F5F5F0] overflow-hidden mb-4">
+                        {p.images && p.images.length > 0 ? (
+                          <img 
+                            src={getMediaUrl(p.images[0].image)} 
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                            alt={p.name} 
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400 font-bold uppercase tracking-widest">Soley</div>
+                        )}
+                      </div>
+                      <h3 className="text-xs font-bold tracking-widest uppercase mb-1 truncate text-black">{p.name}</h3>
+                      <p className="text-xs text-gray-500 font-light">{p.price} MAD</p>
+                    </Link>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Reviews Section */}
+        <div className="mt-32 pt-20 border-t border-[#ECECEC] font-sans">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-xl lg:text-3xl font-serif text-center mb-4 text-black">Avis de nos clientes</h2>
+            
+            {/* Summary Score */}
+            <div className="flex flex-col items-center justify-center mb-12">
+              <div className="flex items-center gap-2 text-2xl font-serif text-black mb-1">
+                {reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : '5.0'}
+                <span className="text-sm text-gray-400">/ 5</span>
+              </div>
+              <div className="flex gap-1 mb-2">
+                {[1, 2, 3, 4, 5].map((star) => {
+                  const avgRating = reviews.length > 0 ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length : 5;
+                  return (
+                    <Star 
+                      key={star} 
+                      className={`w-4 h-4 ${star <= Math.round(avgRating) ? 'fill-[#FFC20E] text-[#FFC20E]' : 'text-gray-200'}`} 
+                    />
+                  );
+                })}
+              </div>
+              <span className="text-xs text-gray-400 font-bold tracking-wider uppercase">({reviews.length} {reviews.length > 1 ? 'avis' : 'avis'})</span>
+            </div>
+
+            {/* Review List */}
+            <div className="space-y-8 mb-16">
+              {reviews.length > 0 ? (
+                reviews.map((rev) => (
+                  <div key={rev.id} className="pb-6 border-b border-[#F2F2F2]">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-black block mb-1">
+                          {rev.customer?.name || 'Cliente anonyme'}
+                        </span>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star 
+                              key={star} 
+                              className={`w-3.5 h-3.5 ${star <= rev.rating ? 'fill-[#FFC20E] text-[#FFC20E]' : 'text-gray-200'}`} 
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+                        {new Date(rev.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 font-light leading-relaxed">{rev.comment}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-400 font-light text-sm py-8 font-sans">Aucun avis pour l'instant. Soyez la première à donner votre avis !</p>
+              )}
+            </div>
+
+            {/* Write a Review */}
+            {isLoggedIn ? (
+              <form onSubmit={handleAddReview} className="bg-gray-50 p-8 rounded-lg border border-gray-100">
+                <h3 className="text-xs font-bold tracking-widest uppercase mb-6 text-black">Partager votre avis</h3>
+                
+                <div className="mb-6">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">Note :</span>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setNewRating(star)}
+                        className="transition-transform hover:scale-110"
+                      >
+                        <Star 
+                          className={`w-6 h-6 ${star <= newRating ? 'fill-[#FFC20E] text-[#FFC20E]' : 'text-gray-300'}`} 
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <label htmlFor="comment" className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">Commentaire :</label>
+                  <textarea
+                    id="comment"
+                    required
+                    rows={4}
+                    placeholder="Votre avis sur la qualité, la pointure, le confort..."
+                    className="w-full border border-gray-300 rounded-md p-3 text-sm focus:ring-1 focus:ring-black focus:border-black font-sans bg-white text-gray-800"
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSubmittingReview}
+                  className="bg-black hover:bg-gray-900 text-white text-xs font-bold tracking-widest uppercase px-6 py-3 transition-colors disabled:opacity-50"
+                >
+                  {isSubmittingReview ? 'Envoi...' : 'Soumettre mon avis'}
+                </button>
+              </form>
+            ) : (
+              <div className="text-center bg-gray-50 p-8 border border-gray-100 rounded-lg">
+                <p className="text-sm text-gray-500 font-light mb-4 font-sans">Vous devez être connectée pour soumettre un avis.</p>
+                <Link 
+                  to="/login" 
+                  className="inline-block border border-black hover:bg-black hover:text-white transition-colors text-xs font-bold tracking-widest uppercase px-6 py-3"
+                >
+                  Se connecter
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
+
+      {/* VIDEO MODAL */}
+      {isVideoModalOpen && product.videoUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-95">
+          <div className="relative w-full max-w-4xl aspect-video bg-black flex items-center justify-center">
+            <button 
+              onClick={() => setIsVideoModalOpen(false)}
+              className="absolute -top-12 right-0 text-white hover:text-gray-300 flex items-center gap-2 text-xs font-bold tracking-widest uppercase transition-colors"
+            >
+              <X className="w-5 h-5" /> Fermer
+            </button>
+            {product.videoUrl.includes('youtube.com') || product.videoUrl.includes('youtu.be') ? (
+              <iframe
+                src={product.videoUrl.replace('watch?v=', 'embed/').split('&')[0]}
+                title="Product Video"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            ) : (
+              <video 
+                src={product.videoUrl} 
+                controls 
+                autoPlay 
+                className="w-full h-full max-h-[80vh] object-contain"
+              ></video>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* EXPRESS CHECKOUT MODAL */}
       {isCheckoutModalOpen && (

@@ -1,5 +1,5 @@
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, Package, Users, Settings, Tag, FolderTree, Layers, Palette, Ruler, Archive, Image as ImageIcon } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, Users, Settings, Tag, FolderTree, Layers, Palette, Ruler, Archive, Image as ImageIcon, Activity } from 'lucide-react';
 
 export default function XrpLayout() {
   const location = useLocation();
@@ -28,6 +28,7 @@ export default function XrpLayout() {
           <Link to="/xrp/customers" className={getLinkClass('/xrp/customers')}><Users size={20} /> Clients</Link>
           <Link to="/xrp/banners" className={getLinkClass('/xrp/banners')}><ImageIcon size={20} /> Bannières</Link>
           <Link to="/xrp/coupons" className={getLinkClass('/xrp/coupons')}><Tag size={20} /> Codes Promo</Link>
+          <Link to="/xrp/logs" className={getLinkClass('/xrp/logs')}><Activity size={20} /> Audit Logs</Link>
         </nav>
         <Link to="/xrp/settings" className={`mt-8 ${getLinkClass('/xrp/settings')}`}><Settings size={20} /> Paramètres</Link>
       </aside>

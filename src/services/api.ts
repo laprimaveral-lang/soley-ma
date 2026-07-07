@@ -139,6 +139,7 @@ export const CouponService = {
 export const OrderService = {
   getOrders: () => api.get('/orders').then(res => res.data),
   getCustomerOrders: () => api.get('/orders/me').then(res => res.data),
+  getOrderById: (id: string) => api.get(`/orders/${id}`).then(res => res.data),
   createOrder: (data: any) => api.post('/orders', data).then(res => res.data),
   updateOrder: (id: string, data: any) => api.put(`/orders/${id}`, data).then(res => res.data),
   deleteOrder: (id: string) => api.delete(`/orders/${id}`).then(res => res.data),
@@ -154,4 +155,13 @@ export const WishlistService = {
   getWishlist: () => api.get('/wishlist').then(res => res.data),
   addToWishlist: (productId: string) => api.post('/wishlist', { productId }).then(res => res.data),
   removeFromWishlist: (productId: string) => api.delete(`/wishlist/${productId}`).then(res => res.data),
+};
+
+export const ReviewService = {
+  getReviews: (productId: string) => api.get(`/products/${productId}/reviews`).then(res => res.data),
+  createReview: (productId: string, rating: number, comment: string) => api.post(`/products/${productId}/reviews`, { rating, comment }).then(res => res.data),
+};
+
+export const ActivityLogService = {
+  getLogs: () => api.get('/admin/logs').then(res => res.data),
 };

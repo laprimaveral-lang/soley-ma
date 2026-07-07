@@ -13,6 +13,7 @@ const Checkout = lazy(() => import('./pages/Checkout'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Account = lazy(() => import('./pages/Account'));
+const Invoice = lazy(() => import('./pages/Invoice'));
 const XrpLayout = lazy(() => import('./layouts/XrpLayout'));
 const AdminDashboard = lazy(() => import('./pages/xrp/AdminDashboard'));
 const AdminProducts = lazy(() => import('./pages/xrp/AdminProducts'));
@@ -26,6 +27,7 @@ const AdminInventory = lazy(() => import('./pages/xrp/AdminInventory'));
 const AdminBanners = lazy(() => import('./pages/xrp/AdminBanners'));
 const AdminCoupons = lazy(() => import('./pages/xrp/AdminCoupons'));
 const AdminSettings = lazy(() => import('./pages/xrp/AdminSettings'));
+const AdminLogs = lazy(() => import('./pages/xrp/AdminLogs'));
 const StaticPages = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.About })));
 const FAQPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.FAQ })));
 const DeliveryPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.DeliveryReturns })));
@@ -58,6 +60,7 @@ function App() {
             <Route path="checkout" element={<Checkout />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="account/orders/:id/invoice" element={<Invoice />} />
             <Route path="account/*" element={<Account />} />
             <Route path="about" element={<StaticPages />} />
             <Route path="faq" element={<FAQPage />} />
@@ -79,6 +82,7 @@ function App() {
               <Route path="banners" element={<AdminBanners />} />
               <Route path="coupons" element={<AdminCoupons />} />
               <Route path="settings" element={<AdminSettings />} />
+              <Route path="logs" element={<AdminLogs />} />
             </Route>
           </Route>
         </Routes>

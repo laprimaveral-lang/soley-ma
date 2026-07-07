@@ -22,6 +22,17 @@ const pool = new Pool({
 const adapter = new PrismaPg(pool as any);
 const prisma = new PrismaClient({ adapter });
 
+function sendMailSimulated(to: string, subject: string, body: string) {
+  const logDir = path.join(__dirname, 'logs');
+  if (!fs.existsSync(logDir)) {
+    fs.mkdirSync(logDir, { recursive: true });
+  }
+  const logPath = path.join(logDir, 'emails.log');
+  const logEntry = `[${new Date().toISOString()}] TO: ${to} | SUBJECT: ${subject}\nBODY:\n${body}\n========================================\n`;
+  fs.appendFileSync(logPath, logEntry);
+  console.log(`[EMAIL SIMULATION] Sent email to ${to} with subject "${subject}". Logged to ${logPath}`);
+}
+
 // Security headers
 app.use(helmet({
   contentSecurityPolicy: false, // Géré par Nginx
@@ -111,6 +122,9 @@ app.post('/api/auth/register', async (req, res) => {
       data: { name, email, password: hashedPassword, role: 'customer' }
     });
     
+    // Send simulated email
+    sendMailSimulated(user.email, 'Bienvenue chez Soley.ma', `Bonjour ${user.name},\n\nVotre compte client a été créé avec succès sur Soley.ma !\n\nL'équipe Soley.`);
+
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {
@@ -139,16 +153,63 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-const verifyAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+// Forgot / Reset Password
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    // Generate a temporary 6-digit PIN code
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    // In production, we'd store it in DB with expiry. For simulation, print code in email log.
+    sendMailSimulated(email, 'Réinitialisation de votre mot de passe - Soley.ma', `Bonjour,\n\nVous avez demandé à réinitialiser votre mot de passe.\nVoici votre code temporaire : ${resetCode}\n\nL'équipe Soley.`);
+    res.json({ success: true, message: 'Reset code sent to email' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to process forgot password request' });
+  }
+});
+
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword }
+    });
+    sendMailSimulated(email, 'Mot de passe réinitialisé avec succès - Soley.ma', `Bonjour,\n\nVotre mot de passe a bien été modifié.\n\nL'équipe Soley.`);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});
+
+const verifyAdmin = (req: any, res: express.Response, next: express.NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token provided' });
   
   jwt.verify(token, JWT_SECRET, (err, decoded: any) => {
     if (err) return res.status(401).json({ error: 'Invalid token' });
     if (decoded.role !== 'admin') return res.status(403).json({ error: 'Access denied' });
+    req.user = decoded;
     next();
   });
 };
+
+async function logActivity(adminId: string, action: string, details: string) {
+  try {
+    await prisma.activityLog.create({
+      data: {
+        adminId,
+        action,
+        details
+      }
+    });
+  } catch (error) {
+    console.error('Failed to save activity log:', error);
+  }
+}
 
 const verifyCustomer = (req: any, res: express.Response, next: express.NextFunction) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -234,7 +295,7 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', verifyAdmin, async (req: any, res) => {
   try {
     const { colorIds, sizeIds, ...data } = req.body;
     
@@ -267,6 +328,7 @@ app.post('/api/products', async (req, res) => {
     data.slug = uniqueSlug;
 
     const product = await prisma.product.create({ data });
+    await logActivity(req.user.id, 'CREATE_PRODUCT', `Created product ${product.name} (Ref: ${product.reference})`);
     res.json(product);
   } catch (error: any) {
     console.error(error);
@@ -277,7 +339,7 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-app.put('/api/products/:id', async (req, res) => {
+app.put('/api/products/:id', verifyAdmin, async (req: any, res) => {
   try {
     const { images, colorIds, sizeIds, ...restData } = req.body;
     
@@ -330,6 +392,7 @@ app.put('/api/products/:id', async (req, res) => {
       }
     }
 
+    await logActivity(req.user.id, 'UPDATE_PRODUCT', `Updated product ${product.name} (Ref: ${product.reference})`);
     res.json(product);
   } catch (error) {
     console.error(error);
@@ -337,9 +400,13 @@ app.put('/api/products/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/products/:id', async (req, res) => {
+app.delete('/api/products/:id', verifyAdmin, async (req: any, res) => {
   try {
+    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
     await prisma.product.delete({ where: { id: req.params.id } });
+    if (product) {
+      await logActivity(req.user.id, 'DELETE_PRODUCT', `Deleted product ${product.name} (Ref: ${product.reference})`);
+    }
     res.json({ success: true });
   } catch (error) {
     console.error(error);
@@ -619,15 +686,64 @@ app.post('/api/orders', async (req, res) => {
         }
       }
     });
+
+    // Look up email for notification
+    let customerEmail = req.body.email || '';
+    if (!customerEmail && customerId) {
+      const u = await prisma.user.findUnique({ where: { id: customerId } });
+      if (u) customerEmail = u.email;
+    }
+
+    if (customerEmail) {
+      sendMailSimulated(
+        customerEmail,
+        'Confirmation de votre commande - Soley.ma',
+        `Bonjour ${customerName || 'Cher Client'},\n\nNous vous remercions pour votre commande.\nVotre commande #${order.id.substring(0, 8)} d'un montant de ${total} MAD a bien été reçue et est en cours de traitement.\n\nL'équipe Soley.`
+      );
+    }
+
     res.json(order);
   } catch (error) {
-    console.error('Error creating order:', error);
+    console.error(error);
     res.status(500).json({ error: 'Failed to create order' });
   }
 });
 app.put('/api/orders/:id', async (req, res) => {
   try {
-    const order = await prisma.order.update({ where: { id: req.params.id }, data: req.body });
+    const oldOrder = await prisma.order.findUnique({ where: { id: req.params.id } });
+    const order = await prisma.order.update({ 
+      where: { id: req.params.id }, 
+      data: req.body,
+      include: { customer: true }
+    });
+
+    if (req.body.status && oldOrder && oldOrder.status !== req.body.status) {
+      let customerEmail = order.customer?.email;
+      let customerName = order.customerName || order.customer?.name || 'Client';
+      
+      if (customerEmail) {
+        let subject = '';
+        let body = '';
+        if (req.body.status === 'processing') {
+          subject = `Votre commande #${order.id.substring(0, 8)} est en cours de traitement - Soley.ma`;
+          body = `Bonjour ${customerName},\n\nNous vous informons que votre commande #${order.id.substring(0, 8)} est en cours de préparation.\n\nL'équipe Soley.`;
+        } else if (req.body.status === 'shipped') {
+          subject = `Votre commande #${order.id.substring(0, 8)} a été expédiée - Soley.ma`;
+          body = `Bonjour ${customerName},\n\nBonne nouvelle ! Votre commande #${order.id.substring(0, 8)} a été expédiée.\nTransporteur : ${order.carrier || 'Standard'}\nNuméro de suivi : ${order.trackingCode || 'N/A'}\n\nL'équipe Soley.`;
+        } else if (req.body.status === 'delivered') {
+          subject = `Votre commande #${order.id.substring(0, 8)} a été livrée - Soley.ma`;
+          body = `Bonjour ${customerName},\n\nVotre commande #${order.id.substring(0, 8)} est marquée comme livrée.\nMerci de votre confiance !\n\nL'équipe Soley.`;
+        } else if (req.body.status === 'cancelled') {
+          subject = `Annulation de votre commande #${order.id.substring(0, 8)} - Soley.ma`;
+          body = `Bonjour ${customerName},\n\nNous vous informons que votre commande #${order.id.substring(0, 8)} a été annulée.\n\nL'équipe Soley.`;
+        }
+
+        if (subject && body) {
+          sendMailSimulated(customerEmail, subject, body);
+        }
+      }
+    }
+
     res.json(order);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update order' });
@@ -714,7 +830,7 @@ app.delete('/api/wishlist/:productId', verifyCustomer, async (req: any, res) => 
 });
 
 // --- CUSTOMER ROUTES ---
-app.get('/api/customers', async (req, res) => {
+app.get('/api/customers', verifyAdmin, async (req: any, res) => {
   try {
     const customers = await prisma.user.findMany({ where: { role: 'customer' } });
     res.json(customers);
@@ -722,17 +838,22 @@ app.get('/api/customers', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch customers' });
   }
 });
-app.put('/api/customers/:id', async (req, res) => {
+app.put('/api/customers/:id', verifyAdmin, async (req: any, res) => {
   try {
     const customer = await prisma.user.update({ where: { id: req.params.id }, data: req.body });
+    await logActivity(req.user.id, 'UPDATE_CUSTOMER', `Updated customer ${customer.name} (Email: ${customer.email})`);
     res.json(customer);
   } catch (error) {
     res.status(500).json({ error: 'Failed to update customer' });
   }
 });
-app.delete('/api/customers/:id', async (req, res) => {
+app.delete('/api/customers/:id', verifyAdmin, async (req: any, res) => {
   try {
+    const customer = await prisma.user.findUnique({ where: { id: req.params.id } });
     await prisma.user.delete({ where: { id: req.params.id } });
+    if (customer) {
+      await logActivity(req.user.id, 'DELETE_CUSTOMER', `Deleted customer ${customer.name} (Email: ${customer.email})`);
+    }
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: 'Failed to delete customer' });
@@ -749,7 +870,7 @@ app.get('/api/settings', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch settings' });
   }
 });
-app.post('/api/settings', async (req, res) => {
+app.post('/api/settings', verifyAdmin, async (req: any, res) => {
   try {
     const { key, value } = req.body;
     const setting = await prisma.setting.upsert({
@@ -757,9 +878,205 @@ app.post('/api/settings', async (req, res) => {
       update: { value },
       create: { key, value }
     });
+    await logActivity(req.user.id, 'UPDATE_SETTINGS', `Updated setting key: ${key}`);
     res.json(setting);
   } catch (error) {
     res.status(500).json({ error: 'Failed to save setting' });
+  }
+});
+
+// --- NEW E-COMMERCE ENDPOINTS ---
+
+// 1. GET Order details by ID (including items and images)
+app.get('/api/orders/:id', async (req, res) => {
+  try {
+    const order = await prisma.order.findUnique({
+      where: { id: req.params.id },
+      include: {
+        customer: true,
+        items: {
+          include: {
+            productVariant: {
+              include: {
+                product: {
+                  include: {
+                    images: { orderBy: { position: 'asc' } }
+                  }
+                },
+                color: true,
+                size: true
+              }
+            }
+          }
+        }
+      }
+    });
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch order details' });
+  }
+});
+
+// 2. Reviews Endpoints
+app.get('/api/products/:id/reviews', async (req, res) => {
+  try {
+    const reviews = await prisma.review.findMany({
+      where: { productId: req.params.id },
+      include: {
+        customer: {
+          select: { name: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch reviews' });
+  }
+});
+
+app.post('/api/products/:id/reviews', verifyCustomer, async (req: any, res) => {
+  try {
+    const { rating, comment } = req.body;
+    if (!rating || rating < 1 || rating > 5) {
+      return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+    }
+    const review = await prisma.review.create({
+      data: {
+        rating: parseInt(rating),
+        comment: comment || '',
+        productId: req.params.id,
+        customerId: req.user.id
+      }
+    });
+    res.json(review);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to create review' });
+  }
+});
+
+// 3. Admin Audit Logs
+app.get('/api/admin/logs', verifyAdmin, async (req, res) => {
+  try {
+    const logs = await prisma.activityLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200
+    });
+    res.json(logs);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch logs' });
+  }
+});
+
+// 4. Admin CSV Products Export
+app.get('/api/admin/products/export', verifyAdmin, async (req: any, res) => {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        category: true
+      }
+    });
+
+    let csvContent = "Reference,Name,Price,SalePrice,CostPrice,Stock,Category,Description\n";
+    products.forEach(p => {
+      const name = `"${(p.name || '').replace(/"/g, '""')}"`;
+      const desc = `"${(p.description || '').replace(/"/g, '""')}"`;
+      csvContent += `${p.reference || ''},${name},${p.price},${p.salePrice || ''},${p.costPrice || 0},${p.stock},"${p.category?.name || ''}",${desc}\n`;
+    });
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=products_export.csv');
+    res.status(200).send(csvContent);
+    
+    await logActivity(req.user.id, 'EXPORT_PRODUCTS', `Exported ${products.length} products to CSV`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to export products' });
+  }
+});
+
+// 5. Admin CSV Products Import
+app.post('/api/admin/products/import', verifyAdmin, async (req: any, res) => {
+  try {
+    const { csvText } = req.body;
+    if (!csvText) return res.status(400).json({ error: 'Missing csvText' });
+
+    const lines = csvText.split('\n');
+    let count = 0;
+    
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      const matches = line.split(',');
+      if (matches.length < 3) continue;
+
+      const reference = matches[0]?.replace(/^"|"$/g, '').trim();
+      const name = matches[1]?.replace(/^"|"$/g, '').trim();
+      const price = parseFloat(matches[2] || '0');
+      const salePriceVal = matches[3]?.replace(/^"|"$/g, '').trim();
+      const salePrice = salePriceVal ? parseFloat(salePriceVal) : null;
+      const costPrice = parseFloat(matches[4] || '0');
+      const stock = parseInt(matches[5] || '0');
+      const categoryName = matches[6]?.replace(/^"|"$/g, '').trim();
+      const description = matches[7]?.replace(/^"|"$/g, '').trim() || '';
+
+      if (!name || !reference) continue;
+
+      let categoryId = '';
+      if (categoryName) {
+        const cat = await prisma.category.upsert({
+          where: { slug: categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-') },
+          update: {},
+          create: {
+            name: categoryName,
+            slug: categoryName.toLowerCase().replace(/[^a-z0-9]+/g, '-')
+          }
+        });
+        categoryId = cat.id;
+      } else {
+        const firstCat = await prisma.category.findFirst();
+        if (firstCat) categoryId = firstCat.id;
+        else {
+          const defaultCat = await prisma.category.create({
+            data: { name: 'Default', slug: 'default' }
+          });
+          categoryId = defaultCat.id;
+        }
+      }
+
+      await prisma.product.upsert({
+        where: { slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-') },
+        update: {
+          reference,
+          price,
+          salePrice,
+          costPrice,
+          stock,
+          categoryId,
+          description
+        },
+        create: {
+          reference,
+          name,
+          slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+          price,
+          salePrice,
+          costPrice,
+          stock,
+          categoryId,
+          description
+        }
+      });
+      count++;
+    }
+
+    await logActivity(req.user.id, 'IMPORT_PRODUCTS', `Imported/Updated ${count} products from CSV`);
+    res.json({ success: true, count });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to import CSV' });
   }
 });
 
