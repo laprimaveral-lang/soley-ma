@@ -285,7 +285,9 @@ export default function ProductDetail() {
   if (!product) return <div className="text-center py-20">Produit introuvable.</div>;
 
   const colors = Array.from(new Map(product.variants?.map((v: any) => [v.color?.id, v.color])).values()).filter(Boolean) as any[];
-  const allSizes = ['36', '37', '38', '39', '40', '41'];
+  const allSizes = product.variants && product.variants.length > 0
+    ? Array.from(new Set(product.variants.map((v: any) => v.size?.value).filter(Boolean) as string[])).sort((a, b) => Number(a) - Number(b))
+    : ['36', '37', '38', '39', '40', '41'];
   
   // Find currently active variant matching both selected size and color
   const activeVariant = product.variants?.find((v: any) => 
