@@ -22,32 +22,24 @@ const { chromium } = require('playwright');
     networkErrors.push(`Failed Request: ${request.url()} - ${request.failure()?.errorText || 'Unknown error'}`);
   });
 
-  console.log('Navigating to http://31.220.94.217...');
-  const response = await page.goto('http://31.220.94.217', { waitUntil: 'networkidle' });
+  const categoriesList = ['sandales', 'mules', 'sabots', 'mocassins', 'slippers'];
   
-  console.log(`Status Code: ${response.status()}`);
-  
-  // Wait for React to render
-  await page.waitForTimeout(2000);
-  
-  console.log('Taking screenshot...');
-  const screenshotPath = 'C:\\Users\\ok\\.gemini\\antigravity\\brain\\fef78fda-36eb-4318-b9ab-078cd1f5ba42\\soley_screenshot.png';
-  await page.screenshot({ path: screenshotPath, fullPage: true });
-  console.log(`Screenshot saved to ${screenshotPath}`);
-  
-  const title = await page.title();
-  console.log(`Page Title: ${title}`);
-  
-  const h1 = await page.evaluate(() => {
-    const el = document.querySelector('h1');
-    return el ? el.innerText : 'No H1 found';
-  });
-  console.log(`H1 Text: ${h1}`);
-  
-  const welcomeText = await page.evaluate(() => {
-    return document.body.innerText.includes('Welcome to nginx!');
-  });
-  console.log(`Contains 'Welcome to nginx!': ${welcomeText}`);
+  for (const cat of categoriesList) {
+    console.log(`Navigating to http://31.220.94.217/collections/${cat}...`);
+    await page.goto(`http://31.220.94.217/collections/${cat}`, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
+    
+    const h1 = await page.evaluate(() => {
+      const el = document.querySelector('h1');
+      return el ? el.innerText : 'No H1 found';
+    });
+    
+    const cardCount = await page.evaluate(() => {
+      return document.querySelectorAll('a[href^="/product/"]').length;
+    });
+    
+    console.log(`Category: ${cat} | H1: ${h1} | Cards: ${cardCount}`);
+  }
   
   console.log('--- Errors ---');
   if (errors.length > 0) {

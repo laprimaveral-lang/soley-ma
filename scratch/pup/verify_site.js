@@ -24,8 +24,8 @@ const puppeteer = require('puppeteer');
     networkErrors.push(`Failed Request: ${request.url()} - ${request.failure().errorText}`);
   });
 
-  console.log('Navigating to http://31.220.94.217...');
-  const response = await page.goto('http://31.220.94.217', { waitUntil: 'networkidle0', timeout: 30000 });
+  console.log('Navigating to http://31.220.94.217/collections/sandales...');
+  const response = await page.goto('http://31.220.94.217/collections/sandales', { waitUntil: 'networkidle0', timeout: 30000 });
   
   console.log(`Status Code: ${response.status()}`);
   
@@ -46,10 +46,16 @@ const puppeteer = require('puppeteer');
   });
   console.log(`H1 Text: ${h1}`);
   
-  const welcomeText = await page.evaluate(() => {
-    return document.body.innerText.includes('Welcome to nginx!');
+  const cardCount = await page.evaluate(() => {
+    return document.querySelectorAll('a[href^="/product/"]').length;
   });
-  console.log(`Contains 'Welcome to nginx!': ${welcomeText}`);
+  console.log(`Product Cards Found: ${cardCount}`);
+
+  const pageHtmlSample = await page.evaluate(() => {
+    const el = document.querySelector('.bg-white.min-h-screen');
+    return el ? el.innerHTML.slice(0, 1000) : 'No main container found';
+  });
+  console.log(`HTML Sample: ${pageHtmlSample}`);
   
   console.log('--- Errors ---');
   if (errors.length > 0) {
