@@ -312,6 +312,7 @@ app.post('/api/products', verifyAdmin, async (req: any, res) => {
       const sList = sizeIds?.length ? sizeIds : [null];
       const totalVariants = cList.length * sList.length;
       const distributedStock = Math.max(0, Math.floor(Number(data.stock || 0) / totalVariants));
+      const variants = [];
       for (const c of cList) {
         for (const s of sList) {
           const variantData: any = {
@@ -371,11 +372,11 @@ app.put('/api/products/:id', verifyAdmin, async (req: any, res) => {
       }
     }
 
-    // Handle variants if provided
     if (colorIds !== undefined || sizeIds !== undefined) {
       await prisma.productVariant.deleteMany({ where: { productId: req.params.id } });
       if (colorIds?.length || sizeIds?.length) {
         const cList = colorIds?.length ? colorIds : [null];
+        const sList = sizeIds?.length ? sizeIds : [null];
         const totalVariants = cList.length * sList.length;
         const targetStock = restData.stock !== undefined ? restData.stock : product.stock;
         const distributedStock = Math.max(0, Math.floor(Number(targetStock || 0) / totalVariants));
