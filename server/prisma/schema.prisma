@@ -19,6 +19,7 @@ model User {
   orders    Order[]
   wishlists Wishlist[]
   reviews   Review[]
+  isBlacklisted Boolean @default(false)
 }
 
 model Category {
