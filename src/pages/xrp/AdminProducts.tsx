@@ -159,9 +159,14 @@ export default function AdminProducts() {
 
   const handleDelete = async () => {
     if (!deleteConfirm) return;
-    await ProductService.deleteProduct(deleteConfirm);
-    setDeleteConfirm(null);
-    fetchData();
+    try {
+      await ProductService.deleteProduct(deleteConfirm);
+      setDeleteConfirm(null);
+      fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.error || "Une erreur est survenue lors de la suppression du produit.");
+      setDeleteConfirm(null);
+    }
   };
 
   const columns = [

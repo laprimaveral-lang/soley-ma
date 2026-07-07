@@ -402,8 +402,21 @@ app.put('/api/products/:id', verifyAdmin, async (req: any, res) => {
 
 app.delete('/api/products/:id', verifyAdmin, async (req: any, res) => {
   try {
-    const product = await prisma.product.findUnique({ where: { id: req.params.id } });
-    await prisma.product.delete({ where: { id: req.params.id } });
+    const productId = req.params.id;
+    const linkedOrderCount = await prisma.orderItem.count({
+      where: {
+        productVariant: {
+          productId: productId
+        }
+      }
+    });
+
+    if (linkedOrderCount > 0) {
+      return res.status(400).json({ error: "Ce produit ne peut pas être supprimé car il est associé à des commandes existantes. Vous pouvez modifier son statut en 'draft' (brouillon) pour le masquer." });
+    }
+
+    const product = await prisma.product.findUnique({ where: { id: productId } });
+    await prisma.product.delete({ where: { id: productId } });
     if (product) {
       await logActivity(req.user.id, 'DELETE_PRODUCT', `Deleted product ${product.name} (Ref: ${product.reference})`);
     }
