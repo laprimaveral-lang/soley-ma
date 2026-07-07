@@ -23,16 +23,9 @@ export default function Header() {
     <header className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-[#ECECEC] transition-all duration-300">
       {/* Main header navbar */}
       <div className="container mx-auto px-6 lg:px-12 py-3 flex justify-between items-center relative max-w-[1400px]">
-        {/* Left: Logo (Completely left-aligned, transparent, 40-50% larger than before) */}
-        <div className="flex-1 flex justify-start items-center">
-          <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity py-1">
-            <img src="/logo.png?v=3" alt="Soley" className="h-16 md:h-20 w-auto object-contain mix-blend-multiply" />
-          </Link>
-        </div>
-        
-        {/* Center: Menu (Perfectly centered on desktop, animated underlines on hover) */}
-        <nav className="hidden md:flex flex-grow justify-center">
-          <ul className="flex items-center space-x-10 text-[10px] font-bold text-gray-900 tracking-[0.25em] uppercase">
+        {/* Left: Menu */}
+        <nav className="hidden md:flex flex-1 justify-start">
+          <ul className="flex items-center space-x-8 text-[10px] font-bold text-gray-900 tracking-[0.2em] uppercase">
             <li>
               <Link to="/collections/nouveau" className="relative py-2 group">
                 NOUVEAUTÉS
@@ -71,6 +64,13 @@ export default function Header() {
             </li>
           </ul>
         </nav>
+        
+        {/* Center: Logo */}
+        <div className="flex-grow md:flex-none flex justify-center items-center">
+          <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity py-1">
+            <img src="/logo.png?v=3" alt="Soley" className="h-20 md:h-24 w-auto object-contain mix-blend-multiply" />
+          </Link>
+        </div>
         
         {/* Right: Icons */}
         <div className="flex-1 flex justify-end items-center space-x-6 md:space-x-8 text-black">
