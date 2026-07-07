@@ -93,6 +93,7 @@ export default function AdminOrders() {
           processing: 'bg-blue-100 text-blue-700',
           shipped: 'bg-purple-100 text-purple-700',
           delivered: 'bg-green-100 text-green-700',
+          delivered_paid: 'bg-emerald-100 text-emerald-800 border border-emerald-200 font-extrabold',
           cancelled: 'bg-red-100 text-red-700',
         };
         const statusText: any = {
@@ -100,6 +101,7 @@ export default function AdminOrders() {
           processing: 'En cours',
           shipped: 'Expédiée',
           delivered: 'Livrée',
+          delivered_paid: 'Livrée & Payée',
           cancelled: 'Annulée',
         };
         return (
@@ -153,6 +155,7 @@ export default function AdminOrders() {
                   <option value="processing">En cours de traitement</option>
                   <option value="shipped">Expédiée</option>
                   <option value="delivered">Livrée</option>
+                  <option value="delivered_paid">Livrée & Payée</option>
                   <option value="cancelled">Annulée</option>
                 </select>
               </div>
