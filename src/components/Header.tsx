@@ -21,11 +21,6 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-[#ECECEC] transition-all duration-300">
-      {/* Promotion bar */}
-      <div className="bg-black text-white text-center py-2.5 text-[9px] md:text-[10px] font-bold tracking-[0.25em] uppercase">
-        OFFRE LIMITÉE : 2 ACHETÉS = LA 3ÈME GRATUITE 🎁
-      </div>
-      
       {/* Main header navbar */}
       <div className="container mx-auto px-6 lg:px-12 py-3 flex justify-between items-center relative max-w-[1400px]">
         {/* Left: Logo (Completely left-aligned, transparent, 40-50% larger than before) */}
