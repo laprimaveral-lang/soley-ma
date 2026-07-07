@@ -137,6 +137,26 @@ export default function AdminOrders() {
         </div>
       </div>
 
+      {/* Statistiques des commandes */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 font-sans">
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Commandes</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">{orders.length}</p>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Quantité Vendue</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">
+            {orders.reduce((sum, order) => sum + (order.items?.reduce((s: number, i: any) => s + i.quantity, 0) || 0), 0)} articles
+          </p>
+        </div>
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Chiffre d'Affaires</p>
+          <p className="text-3xl font-bold text-emerald-600 mt-2">
+            {orders.reduce((sum, order) => sum + order.total, 0).toLocaleString('fr-FR')} MAD
+          </p>
+        </div>
+      </div>
+
       <DataTable data={orders} columns={columns} searchPlaceholder="Rechercher par ID ou nom de client..." />
 
       {isModalOpen && (
