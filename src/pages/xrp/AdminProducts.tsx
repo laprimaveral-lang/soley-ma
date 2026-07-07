@@ -17,7 +17,7 @@ export default function AdminProducts() {
 
   const [formData, setFormData] = useState({
     name: '', reference: '', slug: '', description: '', categoryId: '', 
-    price: 0, salePrice: '', costPrice: 0, videoUrl: '', stock: 0, status: 'draft', images: [] as string[],
+    price: '' as any, salePrice: '', costPrice: '' as any, videoUrl: '', stock: '' as any, status: 'draft', images: [] as string[],
     colorIds: [] as string[], sizeIds: [] as string[]
   });
 
@@ -100,11 +100,11 @@ export default function AdminProducts() {
         slug: product.slug,
         description: product.description || '',
         categoryId: product.categoryId || '',
-        price: product.price,
-        salePrice: product.salePrice || '',
-        costPrice: product.costPrice || 0,
+        price: product.price ?? '',
+        salePrice: product.salePrice ?? '',
+        costPrice: product.costPrice ?? '',
         videoUrl: product.videoUrl || '',
-        stock: product.stock,
+        stock: product.stock ?? '',
         status: product.status,
         images: product.images?.map((i: any) => i.image) || [],
         colorIds: Array.from(new Set(product.variants?.map((v: any) => v.colorId).filter(Boolean))) as string[],
@@ -114,7 +114,7 @@ export default function AdminProducts() {
       setEditingProduct(null);
       setFormData({
         name: '', reference: '', slug: '', description: '', categoryId: categories[0]?.id || '', 
-        price: 0, salePrice: '', costPrice: 0, videoUrl: '', stock: 0, status: 'draft', images: [],
+        price: '', salePrice: '', costPrice: '', videoUrl: '', stock: '', status: 'draft', images: [],
         colorIds: [], sizeIds: []
       });
     }
@@ -290,7 +290,7 @@ export default function AdminProducts() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Prix régulier (MAD)</label>
-                  <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.valueAsNumber})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" required />
+                  <input type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" required />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Prix promo (MAD)</label>
@@ -298,7 +298,7 @@ export default function AdminProducts() {
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Prix d'Achat (MAD)</label>
-                  <input type="number" value={formData.costPrice} onChange={e => setFormData({...formData, costPrice: e.target.valueAsNumber})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
+                  <input type="number" value={formData.costPrice} onChange={e => setFormData({...formData, costPrice: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm" />
                 </div>
               </div>
 
@@ -312,7 +312,7 @@ export default function AdminProducts() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Stock total</label>
-                  <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.valueAsNumber})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" required />
+                  <input type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none" required />
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-gray-700 mb-2">Statut</label>
