@@ -689,6 +689,34 @@ app.get('/api/orders', async (req, res) => {
 app.post('/api/orders', async (req, res) => {
   try {
     const { items, customerId, customerName, customerPhone, shippingAddress, subtotal, total, shipping, discount } = req.body;
+
+    const orderItemsToCreate = [];
+    for (const item of items) {
+      // Find matching variant based on product ID, color, and size
+      let variant = await prisma.productVariant.findFirst({
+        where: {
+          productId: item.id,
+          color: item.selectedColor ? { name: item.selectedColor } : undefined,
+          size: item.selectedSize ? { value: item.selectedSize } : undefined
+        }
+      });
+
+      // Fallback to any variant of this product if specific variant is not found
+      if (!variant) {
+        variant = await prisma.productVariant.findFirst({
+          where: { productId: item.id }
+        });
+      }
+
+      // Fallback to direct variant ID or item ID (avoiding database constraint crashes)
+      const productVariantId = variant ? variant.id : (item.productVariantId || item.id);
+
+      orderItemsToCreate.push({
+        productVariantId,
+        quantity: item.quantity,
+        price: item.price
+      });
+    }
     
     const order = await prisma.order.create({
       data: {
@@ -702,11 +730,7 @@ app.post('/api/orders', async (req, res) => {
         discount: discount || 0,
         status: 'pending',
         items: {
-          create: items.map((item: any) => ({
-            productVariantId: item.productVariantId || item.id,
-            quantity: item.quantity,
-            price: item.price
-          }))
+          create: orderItemsToCreate
         }
       }
     });
