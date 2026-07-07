@@ -62,6 +62,12 @@ export default function Cart() {
                   </div>
                 </div>
               ))}
+              
+              <div className="pt-4 flex justify-start">
+                <Link to="/" className="inline-flex items-center gap-2 text-xs font-bold tracking-widest uppercase text-gray-600 hover:text-black transition-colors bg-white px-6 py-3 rounded-full border border-gray-200 shadow-sm hover:shadow-md">
+                  ← Continuer mes achats
+                </Link>
+              </div>
             </div>
 
             {/* Order Summary */}
