@@ -1146,6 +1146,262 @@ app.post('/api/admin/products/import', verifyAdmin, async (req: any, res) => {
   }
 });
 
+// ==========================================
+// ERP ENDPOINTS
+// ==========================================
+
+// 1. ERP Dashboard Stats
+app.get('/api/erp/dashboard', verifyAdmin, async (req: any, res) => {
+  try {
+    const now = new Date();
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay());
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    const orders = await prisma.order.findMany({ include: { items: true } });
+    const customers = await prisma.user.findMany({ where: { role: 'customer' } });
+    const variants = await prisma.productVariant.findMany({ include: { product: true } });
+    
+    // Revenue calculations
+    const getCa = (sinceDate: Date) => orders
+      .filter(o => new Date(o.createdAt) >= sinceDate && o.status !== 'cancelled')
+      .reduce((sum, o) => sum + o.total, 0);
+
+    const caToday = getCa(startOfDay);
+    const caWeek = getCa(startOfWeek);
+    const caMonth = getCa(startOfMonth);
+    const caYear = getCa(startOfYear);
+
+    const ordersCount = orders.length;
+    const pendingOrders = orders.filter(o => o.status === 'pending').length;
+    const shippedOrders = orders.filter(o => o.status === 'shipped').length;
+    const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
+
+    // Stock metrics
+    const stockRupture = variants.filter(v => v.stock === 0).length;
+    const stockLow = variants.filter(v => v.stock > 0 && v.stock <= (v.product.minStock || 5)).length;
+    const stockValueCost = variants.reduce((sum, v) => sum + (v.stock * v.product.costPrice), 0);
+    const stockValueRetail = variants.reduce((sum, v) => sum + (v.stock * v.product.price), 0);
+
+    // Sales by city and payment method
+    const cities: any = {};
+    const paymentMethods: any = { COD: 0, Card: 0 };
+    orders.forEach(o => {
+      if (o.status !== 'cancelled') {
+        const city = o.shippingAddress?.split(',')[1]?.trim() || 'Inconnue';
+        cities[city] = (cities[city] || 0) + o.total;
+        paymentMethods.COD = (paymentMethods.COD || 0) + o.total;
+      }
+    });
+
+    res.json({
+      caToday,
+      caWeek,
+      caMonth,
+      caYear,
+      ordersCount,
+      pendingOrders,
+      shippedOrders,
+      cancelledOrders,
+      customersCount: customers.length,
+      stockRupture,
+      stockLow,
+      stockValueCost,
+      stockValueRetail,
+      cities,
+      paymentMethods
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to load ERP dashboard stats' });
+  }
+});
+
+// 2. Suppliers API
+app.get('/api/erp/suppliers', verifyAdmin, async (req, res) => {
+  try {
+    const suppliers = await prisma.supplier.findMany({ include: { purchases: true } });
+    res.json(suppliers);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch suppliers' });
+  }
+});
+
+app.post('/api/erp/suppliers', verifyAdmin, async (req, res) => {
+  try {
+    const s = await prisma.supplier.create({ data: req.body });
+    res.json(s);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to create supplier' });
+  }
+});
+
+app.put('/api/erp/suppliers/:id', verifyAdmin, async (req, res) => {
+  try {
+    const s = await prisma.supplier.update({ where: { id: req.params.id }, data: req.body });
+    res.json(s);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to update supplier' });
+  }
+});
+
+app.delete('/api/erp/suppliers/:id', verifyAdmin, async (req, res) => {
+  try {
+    await prisma.supplier.delete({ where: { id: req.params.id } });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to delete supplier' });
+  }
+});
+
+// 3. Purchases API
+app.get('/api/erp/purchases', verifyAdmin, async (req, res) => {
+  try {
+    const purchases = await prisma.purchaseOrder.findMany({ include: { supplier: true, items: true } });
+    res.json(purchases);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch purchase orders' });
+  }
+});
+
+app.post('/api/erp/purchases', verifyAdmin, async (req, res) => {
+  try {
+    const { supplierId, reference, items } = req.body;
+    const totalAmount = items.reduce((sum: number, it: any) => sum + (it.quantity * it.unitPrice), 0);
+    
+    const po = await prisma.purchaseOrder.create({
+      data: {
+        supplierId,
+        reference,
+        totalAmount,
+        items: {
+          create: items.map((it: any) => ({
+            productId: it.productId,
+            quantity: it.quantity,
+            unitPrice: it.unitPrice
+          }))
+        }
+      },
+      include: { items: true }
+    });
+    res.json(po);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Failed to create purchase order' });
+  }
+});
+
+app.put('/api/erp/purchases/:id', verifyAdmin, async (req: any, res) => {
+  try {
+    const { status } = req.body;
+    const po = await prisma.purchaseOrder.findUnique({
+      where: { id: req.params.id },
+      include: { items: true }
+    });
+
+    if (!po) return res.status(404).json({ error: 'Order not found' });
+
+    if (status === 'received' && po.status !== 'received') {
+      for (const item of po.items) {
+        const variant = await prisma.productVariant.findFirst({
+          where: { productId: item.productId }
+        });
+        if (variant) {
+          await prisma.productVariant.update({
+            where: { id: variant.id },
+            data: { stock: { increment: item.quantity } }
+          });
+
+          await prisma.stockTransaction.create({
+            data: {
+              productId: item.productId,
+              variantId: variant.id,
+              type: 'IN',
+              quantity: item.quantity,
+              unitCost: item.unitPrice,
+              reference: po.reference,
+              notes: `Réception achat fournisseur`
+            }
+          });
+        }
+      }
+    }
+
+    const updated = await prisma.purchaseOrder.update({
+      where: { id: req.params.id },
+      data: { status },
+      include: { items: true }
+    });
+
+    await logActivity(req.user.id, 'UPDATE_PURCHASE', `Updated purchase order status to ${status} (Ref: ${po.reference})`);
+    res.json(updated);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Failed to update purchase order' });
+  }
+});
+
+// 4. Stock Operations
+app.get('/api/erp/stock/transactions', verifyAdmin, async (req, res) => {
+  try {
+    const txs = await prisma.stockTransaction.findMany({
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(txs);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch transactions' });
+  }
+});
+
+app.post('/api/erp/stock/adjust', verifyAdmin, async (req: any, res) => {
+  try {
+    const { variantId, quantity, type, notes } = req.body;
+    const variant = await prisma.productVariant.findUnique({
+      where: { id: variantId },
+      include: { product: true }
+    });
+    if (!variant) return res.status(404).json({ error: 'Variant not found' });
+
+    const change = type === 'IN' ? quantity : -quantity;
+    
+    await prisma.productVariant.update({
+      where: { id: variantId },
+      data: { stock: { increment: change } }
+    });
+
+    const tx = await prisma.stockTransaction.create({
+      data: {
+        productId: variant.productId,
+        variantId,
+        type,
+        quantity,
+        unitCost: variant.product.costPrice,
+        notes: notes || 'Ajustement manuel de stock'
+      }
+    });
+
+    await logActivity(req.user.id, 'STOCK_ADJUSTMENT', `Adjusted variant stock by ${change} (SKU: ${variant.sku})`);
+    res.json(tx);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Failed to adjust stock' });
+  }
+});
+
+// 5. Audit logs route
+app.get('/api/erp/audit-logs', verifyAdmin, async (req, res) => {
+  try {
+    const logs = await prisma.activityLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200
+    });
+    res.json(logs);
+  } catch (e) {
+    res.status(500).json({ error: 'Failed to fetch audit logs' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
