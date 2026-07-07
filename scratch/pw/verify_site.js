@@ -22,24 +22,30 @@ const { chromium } = require('playwright');
     networkErrors.push(`Failed Request: ${request.url()} - ${request.failure()?.errorText || 'Unknown error'}`);
   });
 
-  const categoriesList = ['sandales', 'mules', 'sabots', 'mocassins', 'slippers'];
+  console.log('Navigating to http://31.220.94.217/product/d5608133-901d-4740-b08e-0e3beeca3bab...');
+  await page.goto('http://31.220.94.217/product/d5608133-901d-4740-b08e-0e3beeca3bab', { waitUntil: 'networkidle' });
+  await page.waitForTimeout(2000);
   
-  for (const cat of categoriesList) {
-    console.log(`Navigating to http://31.220.94.217/collections/${cat}...`);
-    await page.goto(`http://31.220.94.217/collections/${cat}`, { waitUntil: 'networkidle' });
-    await page.waitForTimeout(1000);
-    
-    const h1 = await page.evaluate(() => {
-      const el = document.querySelector('h1');
-      return el ? el.innerText : 'No H1 found';
-    });
-    
-    const cardCount = await page.evaluate(() => {
-      return document.querySelectorAll('a[href^="/product/"]').length;
-    });
-    
-    console.log(`Category: ${cat} | H1: ${h1} | Cards: ${cardCount}`);
-  }
+  const title = await page.title();
+  console.log(`Page Title: ${title}`);
+  
+  const h1 = await page.evaluate(() => {
+    const el = document.querySelector('h1');
+    return el ? el.innerText : 'No H1 found';
+  });
+  console.log(`H1 Text: ${h1}`);
+  
+  const pointuresCount = await page.evaluate(() => {
+    // Buttons matching sizes 36-41 in pointures grid
+    return Array.from(document.querySelectorAll('button')).filter(b => /^(36|37|38|39|40|41)/.test(b.innerText)).length;
+  });
+  console.log(`Pointures Buttons Found: ${pointuresCount}`);
+
+  const colorsCount = await page.evaluate(() => {
+    // Buttons with color round pastille inside selection grid
+    return document.querySelectorAll('button span[style*="background-color"]').length;
+  });
+  console.log(`Color Swatches Found: ${colorsCount}`);
   
   console.log('--- Errors ---');
   if (errors.length > 0) {
