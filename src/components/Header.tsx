@@ -68,7 +68,7 @@ export default function Header() {
         {/* Center: Logo */}
         <div className="flex-grow md:flex-none flex justify-center items-center">
           <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity py-1">
-            <img src="/logo.png?v=3" alt="Soley" className="h-20 md:h-24 w-auto object-contain mix-blend-multiply" />
+            <img src="/logo.png?v=4" alt="Soley" className="h-20 md:h-24 w-auto object-contain" />
           </Link>
         </div>
         
