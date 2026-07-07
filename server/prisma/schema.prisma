@@ -20,6 +20,7 @@ model User {
   wishlists Wishlist[]
   reviews   Review[]
   isBlacklisted Boolean @default(false)
+  permissions String?
 }
 
 model Category {
@@ -53,6 +54,13 @@ model Product {
   isNew          Boolean          @default(false)
   isBestSeller   Boolean          @default(false)
   active         Boolean          @default(true)
+  barcode        String?
+  brand          String?
+  location       String?
+  minStock       Int              @default(0)
+  tva            Float            @default(20.0)
+  priceHistory   String?
+  changeHistory  String?
   createdAt      DateTime         @default(now())
   category       Category         @relation(fields: [categoryId], references: [id])
   images         ProductImage[]
@@ -234,4 +242,47 @@ model ActivityLog {
   adminId   String
   details   String
   createdAt DateTime @default(now())
+}
+
+model Supplier {
+  id        String          @id @default(uuid())
+  name      String
+  phone     String?
+  email     String?
+  address   String?
+  balance   Float           @default(0)
+  createdAt DateTime        @default(now())
+  purchases PurchaseOrder[]
+}
+
+model PurchaseOrder {
+  id          String         @id @default(uuid())
+  supplierId  String
+  reference   String         @unique
+  status      String         @default("draft")
+  totalAmount Float          @default(0)
+  createdAt   DateTime       @default(now())
+  supplier    Supplier       @relation(fields: [supplierId], references: [id])
+  items       PurchaseItem[]
+}
+
+model PurchaseItem {
+  id              String         @id @default(uuid())
+  purchaseOrderId String
+  productId       String
+  quantity        Int
+  unitPrice       Float
+  purchaseOrder   PurchaseOrder  @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+}
+
+model StockTransaction {
+  id         String   @id @default(uuid())
+  productId  String
+  variantId  String?
+  type       String
+  quantity   Int
+  unitCost   Float    @default(0)
+  reference  String?
+  notes      String?
+  createdAt  DateTime @default(now())
 }
