@@ -133,27 +133,12 @@ export default function Home() {
         </FadeUp>
       </section>
 
-      {/* LUXURY ABOUT BANNER */}
-      <section className="bg-ivory py-[120px]">
-        <FadeUp className="container mx-auto px-6 max-w-4xl text-center">
-          <span className="block text-[10px] font-bold tracking-[0.3em] uppercase mb-8 text-primary">La Maison Soley</span>
-          <h2 className="text-3xl md:text-5xl font-serif text-secondary mb-12 leading-snug">
-            "Le véritable luxe réside dans l'alliance de l'élégance intemporelle et du confort absolu."
-          </h2>
-          <p className="text-sm text-gray-500 leading-loose font-light max-w-2xl mx-auto mb-12">
-            Depuis plus de 20 ans, nos artisans sélectionnent les cuirs les plus nobles pour concevoir des chaussures qui respectent l'anatomie féminine. Chaque pièce est le fruit d'un savoir-faire méticuleux.
-          </p>
-          <Link to="/about" className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all duration-500 group">
-            <ArrowRight className="w-5 h-5 stroke-1 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </FadeUp>
-      </section>
-
       {/* BEST SELLERS */}
-      <section className="container mx-auto px-6 md:px-12 py-[120px] max-w-[1400px]">
+      <section className="container mx-auto px-6 md:px-12 py-[80px] max-w-[1400px]">
         <FadeUp className="flex flex-col md:flex-row justify-between items-end mb-16">
           <div className="max-w-md">
-            <h2 className="text-xs font-bold tracking-[0.25em] uppercase mb-4 text-black">Les Iconiques</h2>
+            <h2 className="text-xs font-bold tracking-[0.25em] uppercase mb-4 text-black">Les Meilleures Ventes</h2>
+            <div className="w-px h-12 bg-black mb-6 hidden md:block"></div>
             <p className="text-gray-500 text-xs leading-relaxed uppercase tracking-wider">
               Les pièces signature de la maison Soley. Celles qui ont conquis nos clientes.
             </p>
@@ -174,6 +159,55 @@ export default function Home() {
             ))}
           </div>
         ) : null}
+      </section>
+
+      {/* CATEGORIES */}
+      <section className="bg-gray-50 py-[100px]">
+        <div className="container mx-auto px-6 md:px-12 max-w-[1400px]">
+          <FadeUp className="flex flex-col items-center mb-16 text-center">
+            <h2 className="text-xs font-bold tracking-[0.25em] uppercase mb-4 text-black">Nos Catégories</h2>
+            <div className="w-px h-12 bg-black mb-6"></div>
+          </FadeUp>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { name: 'Sandales', img: 'https://images.unsplash.com/photo-1603487742131-4160ec999306?q=80&w=1000&auto=format&fit=crop', link: '/collections/sandales' },
+              { name: 'Mules', img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop', link: '/collections/mules' },
+              { name: 'Talons', img: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=1000&auto=format&fit=crop', link: '/collections/talons' }
+            ].map((cat, i) => (
+              <FadeUp key={i} delay={i * 0.1} className="relative h-[400px] group overflow-hidden bg-black">
+                <div 
+                  className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
+                  style={{ backgroundImage: `url('${cat.img}')` }}
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Link 
+                    to={cat.link}
+                    className="bg-white/90 backdrop-blur-sm text-black px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors duration-300"
+                  >
+                    {cat.name}
+                  </Link>
+                </div>
+              </FadeUp>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* LUXURY ABOUT BANNER */}
+      <section className="bg-ivory py-[120px]">
+        <FadeUp className="container mx-auto px-6 max-w-4xl text-center">
+          <span className="block text-[10px] font-bold tracking-[0.3em] uppercase mb-8 text-primary">La Maison Soley</span>
+          <h2 className="text-3xl md:text-5xl font-serif text-secondary mb-12 leading-snug">
+            "Le véritable luxe réside dans l'alliance de l'élégance intemporelle et du confort absolu."
+          </h2>
+          <p className="text-sm text-gray-500 leading-loose font-light max-w-2xl mx-auto mb-12">
+            Depuis plus de 20 ans, nos artisans sélectionnent les cuirs les plus nobles pour concevoir des chaussures qui respectent l'anatomie féminine. Chaque pièce est le fruit d'un savoir-faire méticuleux.
+          </p>
+          <Link to="/about" className="inline-flex items-center justify-center w-16 h-16 rounded-full border border-gray-300 hover:border-black hover:bg-black hover:text-white transition-all duration-500 group">
+            <ArrowRight className="w-5 h-5 stroke-1 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </FadeUp>
       </section>
 
     </div>
