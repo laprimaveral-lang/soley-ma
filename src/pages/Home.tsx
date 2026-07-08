@@ -40,38 +40,38 @@ export default function Home() {
     <div className="bg-white">
       {/* HERO SECTION - LUXURY MINIMALIST CENTERED */}
       <section className="relative h-[90vh] md:h-screen w-full flex items-center justify-center overflow-hidden bg-[#F5F5F0]">
-        {/* Large Lifestyle Photography with Parallax and Bottom Focus for Sandals */}
+        {/* Large Lifestyle Photography with Parallax */}
         <div 
-          className="absolute inset-0 bg-cover bg-[center_80%] bg-no-repeat opacity-100 bg-fixed"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-100 bg-fixed"
           style={{ backgroundImage: `url('${mainBanner.image}')` }}
         ></div>
         
-        {/* Very subtle radial gradient just to ensure text readability without looking like a box */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/50 via-black/20 to-transparent"></div>
+        {/* Very subtle linear gradient just from top for header visibility if needed, but mostly rely on text shadows */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-transparent"></div>
 
-        {/* Centered Content Container */}
-        <div className="container mx-auto px-6 relative z-10 w-full flex flex-col items-center justify-center mt-8">
+        {/* Content Container - Pushed slightly above center */}
+        <div className="container mx-auto px-6 relative z-10 w-full flex flex-col items-center justify-start pt-32 md:pt-48 pb-10">
           <FadeUp className="max-w-[520px] w-full text-center flex flex-col items-center" duration={1.5}>
             
-            <span className="block text-[10px] md:text-xs font-medium tracking-[0.3em] text-white/90 mb-5 uppercase">
+            <span className="block text-[10px] md:text-xs font-bold tracking-[0.3em] text-white/95 mb-5 uppercase drop-shadow-md">
               Collection Printemps / Été
             </span>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4 leading-tight uppercase tracking-wider">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4 leading-tight uppercase tracking-wider drop-shadow-lg">
               La Qualité À Son Meilleur
             </h1>
             
-            <h2 className="text-sm md:text-base font-sans text-white/90 mb-6 font-light tracking-widest italic">
+            <h2 className="text-sm md:text-base font-sans text-white/95 mb-6 font-light tracking-widest italic drop-shadow-md">
               Savoir-faire marocain depuis 1997
             </h2>
             
-            <p className="text-white/80 text-xs md:text-sm leading-relaxed mb-10 font-light max-w-sm">
+            <p className="text-white/90 text-xs md:text-sm leading-relaxed mb-10 font-light max-w-sm drop-shadow-md">
               L'excellence du cuir véritable. Des créations façonnées à la main pour offrir élégance intemporelle et confort absolu.
             </p>
             
             <Link 
               to={mainBanner.link || "/collections/nouveau"} 
-              className="inline-flex items-center justify-center gap-3 bg-white text-black hover:scale-105 hover:shadow-2xl px-10 py-4 text-[11px] font-bold tracking-[0.25em] uppercase transition-all duration-500 rounded-full group"
+              className="inline-flex items-center justify-center gap-3 bg-white/95 backdrop-blur-sm text-black hover:bg-white hover:scale-105 hover:shadow-2xl px-10 py-4 text-[11px] font-bold tracking-[0.25em] uppercase transition-all duration-500 rounded-full group"
             >
               Découvrir <ArrowRight className="w-4 h-4 stroke-1 group-hover:translate-x-1 transition-transform duration-500" />
             </Link>
