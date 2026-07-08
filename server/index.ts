@@ -138,7 +138,55 @@ app.post('/api/auth/register', async (req, res) => {
     console.error(error);
     res.status(500).json({ error: 'Server error during registration' });
   }
+});app.post('/api/auth/google', async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) return res.status(400).json({ error: 'Missing Google credential' });
+
+    // Decode the JWT credential from Google (base64 payload)
+    const parts = credential.split('.');
+    if (parts.length !== 3) return res.status(400).json({ error: 'Invalid Google token format' });
+
+    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf8'));
+    const { sub: googleId, email, name, picture } = payload;
+
+    if (!email || !googleId) return res.status(400).json({ error: 'Invalid Google token payload' });
+
+    // Find or create user
+    let user = await prisma.user.findFirst({
+      where: { OR: [{ googleId }, { email }] }
+    });
+
+    if (user) {
+      // Update googleId and avatar if missing
+      if (!user.googleId) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { googleId, avatar: picture }
+        });
+      }
+    } else {
+      // Create new user from Google account
+      user = await prisma.user.create({
+        data: {
+          name: name || email.split('@')[0],
+          email,
+          password: '', // No password for Google users
+          role: 'customer',
+          googleId,
+          avatar: picture
+        }
+      });
+    }
+
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role, avatar: (user as any).avatar } });
+  } catch (error) {
+    console.error('Google auth error:', error);
+    res.status(500).json({ error: 'Server error during Google authentication' });
+  }
 });
+
 
 app.post('/api/auth/login', async (req, res) => {
   try {

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { AuthService } from '../services/api';
+import axios from 'axios';
 
 interface Customer {
   id: string;
@@ -8,6 +9,7 @@ interface Customer {
   email: string;
   phone?: string;
   role?: string;
+  avatar?: string;
 }
 
 interface CustomerAuthContextType {
@@ -15,6 +17,7 @@ interface CustomerAuthContextType {
   isAuthenticated: boolean;
   login: (credentials: any) => Promise<void>;
   register: (data: any) => Promise<void>;
+  loginWithGoogle: (credential: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
 }
@@ -53,6 +56,14 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
     setCustomer(res.user);
   };
 
+  const loginWithGoogle = async (credential: string) => {
+    const res = await axios.post('/api/auth/google', { credential });
+    const { token, user } = res.data;
+    localStorage.setItem('customerToken', token);
+    localStorage.setItem('customerUser', JSON.stringify(user));
+    setCustomer(user);
+  };
+
   const logout = () => {
     AuthService.customerLogout();
     AuthService.logout();
@@ -65,6 +76,7 @@ export function CustomerAuthProvider({ children }: { children: ReactNode }) {
       isAuthenticated: !!customer,
       login,
       register,
+      loginWithGoogle,
       logout,
       loading
     }}>

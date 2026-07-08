@@ -10,7 +10,7 @@ model User {
   id        String     @id @default(uuid())
   name      String
   email     String     @unique
-  password  String
+  password  String     @default("")
   phone     String?
   role      String     @default("customer")
   createdAt DateTime   @default(now())
@@ -21,6 +21,8 @@ model User {
   reviews   Review[]
   isBlacklisted Boolean @default(false)
   permissions String?
+  googleId  String?    @unique
+  avatar    String?
 }
 
 model Category {
