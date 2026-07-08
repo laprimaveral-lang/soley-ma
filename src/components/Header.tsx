@@ -25,15 +25,15 @@ export default function Header() {
       <div className="container mx-auto px-6 lg:px-12 py-4 max-w-[1400px]">
         {/* Top Row: Logo & Icons */}
         <div className="flex justify-between items-center w-full">
-          {/* Left spacer for perfect centering */}
-          <div className="flex-1 flex justify-start"></div>
-          
-          {/* Center: Logo */}
-          <div className="flex justify-center items-center">
+          {/* Left: Logo */}
+          <div className="flex-1 flex justify-start items-center">
             <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity">
               <img src="/logo.png?v=4" alt="Soley" className="h-[70px] md:h-[90px] w-auto object-contain" />
             </Link>
           </div>
+          
+          {/* Center spacer (optional, flex-between handles it) */}
+          <div className="hidden md:flex flex-1 justify-center"></div>
           
           {/* Right: Icons */}
           <div className="flex-1 flex justify-end items-center space-x-5 md:space-x-8 text-black">
