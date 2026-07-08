@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { DollarSign, TrendingUp, Calendar, Clock, MapPin, CreditCard } from 'lucide-react';
-import { OrderService } from '../../services/api';
+import { OrderService, api } from '../../services/api';
 import DataTable from '../../components/xrp/DataTable';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchERPStats();
@@ -14,22 +15,26 @@ export default function AdminDashboard() {
 
   const fetchERPStats = async () => {
     try {
-      const res = await fetch('/api/erp/dashboard', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        }
-      });
-      const data = await res.json();
-      setStats(data);
+      const res = await api.get('/erp/dashboard');
+      setStats(res.data);
       
       const ords = await OrderService.getOrders();
       setOrders(ords || []);
-    } catch (e) {
+    } catch (e: any) {
       console.error('Failed to load ERP stats', e);
+      setError(e.response?.data?.error || 'Erreur de chargement');
     } finally {
       setLoading(false);
     }
   };
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[500px] text-red-500 font-bold">
+        {error}
+      </div>
+    );
+  }
 
   if (loading || !stats) {
     return (
