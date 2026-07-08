@@ -38,38 +38,44 @@ export default function Home() {
 
   return (
     <div className="bg-white">
-      {/* HERO SECTION - LUXURIOUS LEFT-ALIGNED BANNER */}
-      <section className="relative h-[90vh] md:h-[85vh] w-full flex items-center justify-start overflow-hidden bg-[#F5F5F0]">
-        {/* Large Lifestyle Photography */}
+      {/* HERO SECTION - LUXURY MINIMALIST CENTERED */}
+      <section className="relative h-[90vh] md:h-screen w-full flex items-center justify-center overflow-hidden bg-[#F5F5F0]">
+        {/* Large Lifestyle Photography with Parallax and Bottom Focus for Sandals */}
         <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 scale-105 transform transition-transform duration-[10s] hover:scale-100"
+          className="absolute inset-0 bg-cover bg-[center_80%] bg-no-repeat opacity-100 bg-fixed"
           style={{ backgroundImage: `url('${mainBanner.image}')` }}
         ></div>
         
-        {/* Subtle dark gradient overlay from left to right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
+        {/* Very subtle radial gradient just to ensure text readability without looking like a box */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/50 via-black/20 to-transparent"></div>
 
-        <div className="container mx-auto px-6 md:px-12 max-w-[1400px] relative z-10 w-full mt-16">
-          {/* Reduced block width by 30% (from max-w-xl to max-w-md/sm) and smaller padding */}
-          <FadeUp className="max-w-md text-left bg-black/40 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-white/10" duration={1.2}>
-            <span className="block text-[10px] font-bold tracking-[0.3em] text-white/90 mb-3 uppercase">
+        {/* Centered Content Container */}
+        <div className="container mx-auto px-6 relative z-10 w-full flex flex-col items-center justify-center mt-8">
+          <FadeUp className="max-w-[520px] w-full text-center flex flex-col items-center" duration={1.5}>
+            
+            <span className="block text-[10px] md:text-xs font-medium tracking-[0.3em] text-white/90 mb-5 uppercase">
               Collection Printemps / Été
             </span>
-            <h1 className="text-4xl md:text-5xl font-serif text-white mb-2 leading-tight uppercase font-extrabold tracking-wider">
-              {mainBanner.title.replace('<br />', ' ')}
+            
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-4 leading-tight uppercase tracking-wider">
+              La Qualité À Son Meilleur
             </h1>
-            <h2 className="text-base md:text-lg font-sans text-white/90 mb-4 font-light tracking-wide italic">
-              Savoir-faire Marocain depuis 1997
+            
+            <h2 className="text-sm md:text-base font-sans text-white/90 mb-6 font-light tracking-widest italic">
+              Savoir-faire marocain depuis 1997
             </h2>
-            <p className="text-white/80 text-xs md:text-sm leading-relaxed mb-6 font-light">
-              L'excellence du cuir véritable. Des créations façonnées à la main par nos maîtres artisans pour allier élégance intemporelle et confort absolu.
+            
+            <p className="text-white/80 text-xs md:text-sm leading-relaxed mb-10 font-light max-w-sm">
+              L'excellence du cuir véritable. Des créations façonnées à la main pour offrir élégance intemporelle et confort absolu.
             </p>
+            
             <Link 
               to={mainBanner.link || "/collections/nouveau"} 
-              className="inline-flex items-center gap-3 bg-white text-black hover:bg-transparent hover:text-white border border-white px-6 py-3 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 rounded-lg shadow-lg"
+              className="inline-flex items-center justify-center gap-3 bg-white text-black hover:scale-105 hover:shadow-2xl px-10 py-4 text-[11px] font-bold tracking-[0.25em] uppercase transition-all duration-500 rounded-full group"
             >
-              Découvrir <ArrowRight className="w-4 h-4 stroke-2" />
+              Découvrir <ArrowRight className="w-4 h-4 stroke-1 group-hover:translate-x-1 transition-transform duration-500" />
             </Link>
+            
           </FadeUp>
         </div>
       </section>

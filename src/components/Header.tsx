@@ -25,7 +25,7 @@ export default function Header() {
       <div className="container mx-auto px-6 lg:px-12 py-3 flex justify-between items-center relative max-w-[1400px]">
         {/* Left: Menu */}
         <nav className="hidden md:flex flex-1 justify-start">
-          <ul className="flex items-center space-x-8 text-[10px] font-bold text-gray-900 tracking-[0.2em] uppercase">
+          <ul className="flex items-center space-x-12 text-[10px] font-bold text-gray-900 tracking-[0.2em] uppercase">
             <li>
               <Link to="/collections/nouveau" className="relative py-2 group">
                 NOUVEAUTÉS
@@ -68,7 +68,7 @@ export default function Header() {
         {/* Center: Logo */}
         <div className="flex-grow md:flex-none flex justify-center items-center">
           <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity py-1">
-            <img src="/logo.png?v=4" alt="Soley" className="h-20 md:h-24 w-auto object-contain" />
+            <img src="/logo.png?v=4" alt="Soley" className="h-[88px] md:h-[105px] w-auto object-contain" />
           </Link>
         </div>
         
