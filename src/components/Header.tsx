@@ -22,58 +22,21 @@ export default function Header() {
   return (
     <header className="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-[#ECECEC] transition-all duration-300">
       {/* Main header navbar */}
-      <div className="container mx-auto px-6 lg:px-12 py-3 flex justify-between items-center relative max-w-[1400px]">
-        {/* Left: Menu */}
-        <nav className="hidden md:flex flex-1 justify-start">
-          <ul className="flex items-center space-x-12 text-[10px] font-bold text-gray-900 tracking-[0.2em] uppercase">
-            <li>
-              <Link to="/collections/nouveau" className="relative py-2 group">
-                NOUVEAUTÉS
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/collections/sandales" className="relative py-2 group">
-                SANDALES
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/collections/mules" className="relative py-2 group">
-                MULES
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/collections/sabots" className="relative py-2 group">
-                SABOTS
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/collections/mocassins" className="relative py-2 group">
-                MOCASSINS
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </li>
-            <li>
-              <Link to="/collections/slippers" className="relative py-2 group">
-                SLIPPERS
-                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            </li>
-          </ul>
-        </nav>
-        
-        {/* Center: Logo */}
-        <div className="flex-grow md:flex-none flex justify-center items-center">
-          <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity py-1">
-            <img src="/logo.png?v=4" alt="Soley" className="h-[88px] md:h-[105px] w-auto object-contain" />
-          </Link>
-        </div>
-        
-        {/* Right: Icons */}
-        <div className="flex-1 flex justify-end items-center space-x-6 md:space-x-8 text-black">
+      <div className="container mx-auto px-6 lg:px-12 py-4 max-w-[1400px]">
+        {/* Top Row: Logo & Icons */}
+        <div className="flex justify-between items-center w-full">
+          {/* Left spacer for perfect centering */}
+          <div className="flex-1 flex justify-start"></div>
+          
+          {/* Center: Logo */}
+          <div className="flex justify-center items-center">
+            <Link to="/" className="flex-shrink-0 hover:opacity-75 transition-opacity">
+              <img src="/logo.png?v=4" alt="Soley" className="h-[70px] md:h-[90px] w-auto object-contain" />
+            </Link>
+          </div>
+          
+          {/* Right: Icons */}
+          <div className="flex-1 flex justify-end items-center space-x-5 md:space-x-8 text-black">
           {isSearchOpen ? (
             <form onSubmit={handleSearch} className="absolute inset-y-0 right-12 flex items-center bg-transparent z-10 w-full max-w-xs px-4">
               <input 
@@ -148,6 +111,49 @@ export default function Header() {
             </span>
           </Link>
         </div>
+        </div>
+
+        {/* Bottom Row: Navigation */}
+        <nav className="hidden md:flex w-full justify-center mt-6 mb-2">
+          <ul className="flex items-center space-x-12 text-[10px] font-bold text-gray-900 tracking-[0.2em] uppercase">
+            <li>
+              <Link to="/collections/nouveau" className="relative py-2 group">
+                NOUVEAUTÉS
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/collections/sandales" className="relative py-2 group">
+                SANDALES
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/collections/mules" className="relative py-2 group">
+                MULES
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/collections/sabots" className="relative py-2 group">
+                SABOTS
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/collections/mocassins" className="relative py-2 group">
+                MOCASSINS
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/collections/slippers" className="relative py-2 group">
+                SLIPPERS
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
     </header>
   );
