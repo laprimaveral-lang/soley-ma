@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Truck, Wallet, Clock, ShieldCheck } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useState, useEffect } from 'react';
 import { ProductService, BannerService } from '../services/api';
@@ -39,7 +39,7 @@ export default function Home() {
   return (
     <div className="bg-white">
       {/* HERO SECTION - LUXURIOUS LEFT-ALIGNED BANNER */}
-      <section className="relative h-[90vh] md:h-screen w-full flex items-center justify-start overflow-hidden bg-[#F5F5F0]">
+      <section className="relative h-[90vh] md:h-[85vh] w-full flex items-center justify-start overflow-hidden bg-[#F5F5F0]">
         {/* Large Lifestyle Photography */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-95 scale-105 transform transition-transform duration-[10s] hover:scale-100"
@@ -47,31 +47,56 @@ export default function Home() {
         ></div>
         
         {/* Subtle dark gradient overlay from left to right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent"></div>
 
-        <div className="container mx-auto px-6 md:px-12 max-w-[1400px] relative z-10 w-full mt-24">
-          <FadeUp className="max-w-xl text-left bg-black/35 backdrop-blur-md p-8 md:p-12 rounded-2xl border border-white/10" duration={1.2}>
-            <span className="block text-[11px] font-bold tracking-[0.3em] text-white/90 mb-4 uppercase">
+        <div className="container mx-auto px-6 md:px-12 max-w-[1400px] relative z-10 w-full mt-16">
+          {/* Reduced block width by 30% (from max-w-xl to max-w-md/sm) and smaller padding */}
+          <FadeUp className="max-w-md text-left bg-black/40 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-white/10" duration={1.2}>
+            <span className="block text-[10px] font-bold tracking-[0.3em] text-white/90 mb-3 uppercase">
               Collection Printemps / Été
             </span>
-            <h1 className="text-4xl md:text-6xl font-serif text-white mb-2 leading-tight uppercase font-extrabold tracking-wider">
+            <h1 className="text-4xl md:text-5xl font-serif text-white mb-2 leading-tight uppercase font-extrabold tracking-wider">
               {mainBanner.title.replace('<br />', ' ')}
             </h1>
-            <h2 className="text-lg md:text-xl font-sans text-white/90 mb-6 font-light tracking-wide italic">
-              L'élégance à vos pieds
+            <h2 className="text-base md:text-lg font-sans text-white/90 mb-4 font-light tracking-wide italic">
+              Savoir-faire Marocain depuis 1997
             </h2>
-            <p className="text-white/80 text-xs md:text-sm leading-relaxed mb-8 font-light">
-              Découvrez nos créations exclusives façonnées à la main dans des cuirs d'exception pour sublimer chacun de vos pas.
+            <p className="text-white/80 text-xs md:text-sm leading-relaxed mb-6 font-light">
+              L'excellence du cuir véritable. Des créations façonnées à la main par nos maîtres artisans pour allier élégance intemporelle et confort absolu.
             </p>
             <Link 
               to={mainBanner.link || "/collections/nouveau"} 
-              className="inline-flex items-center gap-4 bg-white text-black hover:bg-transparent hover:text-white border border-white px-8 py-4 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 rounded-lg shadow-lg"
+              className="inline-flex items-center gap-3 bg-white text-black hover:bg-transparent hover:text-white border border-white px-6 py-3 text-xs font-bold tracking-[0.2em] uppercase transition-all duration-300 rounded-lg shadow-lg"
             >
               Découvrir <ArrowRight className="w-4 h-4 stroke-2" />
             </Link>
           </FadeUp>
         </div>
       </section>
+
+      {/* REASSURANCE BAND */}
+      <div className="bg-black text-white border-b border-white/10 relative z-20">
+        <div className="container mx-auto px-6 py-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center divide-x divide-white/10">
+            <div className="flex flex-col items-center justify-center space-y-2 p-2">
+              <Truck className="w-5 h-5 text-gray-300" strokeWidth={1.5} />
+              <span className="text-[10px] md:text-xs font-bold tracking-widest uppercase">Livraison Rapide</span>
+            </div>
+            <div className="flex flex-col items-center justify-center space-y-2 p-2">
+              <Wallet className="w-5 h-5 text-gray-300" strokeWidth={1.5} />
+              <span className="text-[10px] md:text-xs font-bold tracking-widest uppercase">Paiement à la livraison</span>
+            </div>
+            <div className="flex flex-col items-center justify-center space-y-2 p-2">
+              <Clock className="w-5 h-5 text-gray-300" strokeWidth={1.5} />
+              <span className="text-[10px] md:text-xs font-bold tracking-widest uppercase">Depuis 1997</span>
+            </div>
+            <div className="flex flex-col items-center justify-center space-y-2 p-2">
+              <ShieldCheck className="w-5 h-5 text-gray-300" strokeWidth={1.5} />
+              <span className="text-[10px] md:text-xs font-bold tracking-widest uppercase">Cuir Véritable</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* NEW COLLECTION */}
       <section className="container mx-auto px-6 md:px-12 py-[100px] max-w-[1400px]">
