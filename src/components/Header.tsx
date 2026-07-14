@@ -152,6 +152,18 @@ export default function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
               </Link>
             </li>
+            <li>
+              <Link to="/about" className="relative py-2 group">
+                À PROPOS
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="relative py-2 group">
+                CONTACT
+                <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-black transition-all duration-300 group-hover:w-full"></span>
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
