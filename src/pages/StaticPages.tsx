@@ -13,13 +13,30 @@ export default function StaticPage({ title, content }: { title: string, content:
 
 export const About = () => (
   <StaticPage 
-    title="À Propos de Soley.ma" 
+    title="À PROPOS DE SOLEY" 
     content={
-      <>
-        <p className="mb-6">Soley.ma est née en 1997 d'une passion pour le confort et l'élégance. Depuis plus de 20 ans, nous avons pour mission de libérer les femmes de la douleur liée au port de chaussures inadaptées, sans jamais sacrifier le style.</p>
-        <p className="mb-6">Nos artisans travaillent avec des matériaux premium pour créer des collections intemporelles de sandales, mules, sabots et mocassins.</p>
-        <p>L'excellence marocaine au service de votre bien-être.</p>
-      </>
+      <div className="flex flex-col gap-6 text-center max-w-2xl mx-auto">
+        <p className="font-medium text-black">
+          SOLEY est un fabricant marocain de chaussures pour femmes et enfants basé à Fès depuis 1997.
+        </p>
+        
+        <p>
+          Fort de plus de 25 ans d'expérience, nous concevons et fabriquons des chaussures alliant confort, qualité et élégance. Notre mission est d'offrir des produits durables, fabriqués avec soin, à partir de matériaux sélectionnés pour garantir le bien-être de nos clientes.
+        </p>
+        
+        <div className="mt-8 pt-8 border-t border-gray-100 flex flex-col items-center gap-4">
+          <p className="text-sm font-bold tracking-widest text-black uppercase">
+            Fabricant de chaussures femme et enfant à Fès depuis 1997
+          </p>
+          <div className="flex gap-4 text-xs font-bold tracking-[0.2em] text-gray-400 uppercase">
+            <span>Qualité</span>
+            <span>•</span>
+            <span>Confort</span>
+            <span>•</span>
+            <span>Élégance</span>
+          </div>
+        </div>
+      </div>
     } 
   />
 );
