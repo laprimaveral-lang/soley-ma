@@ -1,11 +1,11 @@
 export default function Contact() {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-16">
+    <div className="container mx-auto px-4 py-32 text-center">
       <h1 className="text-4xl font-bold mb-8">Contactez-nous</h1>
-      <div className="space-y-6">
-        <p>Nous sommes là pour vous aider !</p>
-        <p><strong>Email:</strong> contact@soley.ma</p>
-        <p><strong>Téléphone:</strong> +212 600 00 00 00</p>
+      <div className="max-w-2xl mx-auto text-gray-600 space-y-4">
+        <p>Nous serions ravis de vous entendre !</p>
+        <p><strong>Email:</strong> laprimaveral@gmail.com</p>
+        <p><strong>Téléphone:</strong> 06 61 11 96 78</p>
         <p><strong>Adresse:</strong> Casablanca, Maroc</p>
       </div>
     </div>

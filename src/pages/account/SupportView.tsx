@@ -17,12 +17,12 @@ export default function SupportView() {
           <ChevronRight className="w-5 h-5 stroke-1 text-gray-300 group-hover:text-black transition-colors" />
         </a>
 
-        <a href="mailto:contact@soley.ma" className="border border-[#ECECEC] p-6 hover:border-black transition-colors group flex items-center justify-between">
+        <a href="mailto:laprimaveral@gmail.com" className="border border-[#ECECEC] p-6 hover:border-black transition-colors group flex items-center justify-between">
           <div className="flex gap-4 items-center">
             <Mail className="w-6 h-6 stroke-1" />
             <div>
               <p className="text-sm font-bold tracking-widest uppercase">Email</p>
-              <p className="text-xs text-gray-500">contact@soley.ma</p>
+              <p className="text-xs text-gray-500">laprimaveral@gmail.com</p>
             </div>
           </div>
           <ChevronRight className="w-5 h-5 stroke-1 text-gray-300 group-hover:text-black transition-colors" />

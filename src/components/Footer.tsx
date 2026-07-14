@@ -94,9 +94,13 @@ export default function Footer() {
             <Link to="/" className="text-4xl font-bold tracking-widest mb-8 hover:opacity-70 transition-opacity">
               Soley<span className="text-sm align-super">®</span>
             </Link>
-            <p className="text-sm text-gray-500 leading-loose max-w-sm">
+            <p className="text-sm text-gray-500 leading-loose max-w-sm mb-8">
               L'élégance intemporelle redéfinie. Des chaussures conçues pour les femmes qui refusent de choisir entre le confort absolu et le design pointu.
             </p>
+            <div className="flex flex-col space-y-3 text-[11px] font-bold tracking-widest uppercase text-black">
+              <a href="mailto:laprimaveral@gmail.com" className="hover:text-gray-500 transition-colors">laprimaveral@gmail.com</a>
+              <a href="tel:0661119678" className="hover:text-gray-500 transition-colors">06 61 11 96 78</a>
+            </div>
           </div>
 
           {/* Column 2: Collections (Takes 2 cols) */}

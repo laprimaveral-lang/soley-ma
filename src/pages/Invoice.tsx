@@ -54,7 +54,8 @@ export default function Invoice() {
           <h1 className="text-2xl font-serif text-black uppercase tracking-widest mb-1">SOLEY.MA</h1>
           <p className="text-xs text-gray-400 font-light">Chaussures Femme Premium</p>
           <p className="text-[10px] text-gray-400 font-light">Casablanca, Maroc</p>
-          <p className="text-[10px] text-gray-400 font-light">Contact: admin@soley.ma</p>
+          <p className="text-[10px] text-gray-400 font-light">Tél: 06 61 11 96 78</p>
+          <p className="text-[10px] text-gray-400 font-light">Contact: laprimaveral@gmail.com</p>
         </div>
         <div className="text-right">
           <h2 className="text-sm font-bold tracking-widest uppercase text-gray-400 mb-2">FACTURE</h2>
@@ -145,7 +146,7 @@ export default function Invoice() {
       {/* Footer message */}
       <div className="text-center text-[10px] text-gray-400 font-light border-t border-gray-100 pt-8">
         <p className="mb-1">Merci de votre confiance et de votre achat sur Soley.ma</p>
-        <p>Pour toute réclamation, contactez-nous sous 7 jours à admin@soley.ma</p>
+        <p>Pour toute réclamation, contactez-nous sous 7 jours à laprimaveral@gmail.com ou au 06 61 11 96 78</p>
       </div>
     </div>
   );
