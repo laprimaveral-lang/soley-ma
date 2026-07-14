@@ -139,38 +139,7 @@ export default function Home() {
         ) : null}
       </section>
 
-      {/* CATEGORIES */}
-      <section className="bg-gray-50 py-[100px]">
-        <div className="container mx-auto px-6 md:px-12 max-w-[1400px]">
-          <FadeUp className="flex flex-col items-center mb-16 text-center">
-            <h2 className="text-xs font-bold tracking-[0.25em] uppercase mb-4 text-black">Nos Catégories</h2>
-            <div className="w-px h-12 bg-black mb-6"></div>
-          </FadeUp>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { name: 'Sandales', img: 'https://images.unsplash.com/photo-1603487742131-4160ec999306?q=80&w=1000&auto=format&fit=crop', link: '/collections/sandales' },
-              { name: 'Mules', img: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop', link: '/collections/mules' },
-              { name: 'Talons', img: 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=1000&auto=format&fit=crop', link: '/collections/talons' }
-            ].map((cat, i) => (
-              <FadeUp key={i} delay={i * 0.1} className="relative h-[400px] group overflow-hidden bg-black">
-                <div 
-                  className="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-60 group-hover:scale-105 transition-all duration-700"
-                  style={{ backgroundImage: `url('${cat.img}')` }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Link 
-                    to={cat.link}
-                    className="bg-white/90 backdrop-blur-sm text-black px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors duration-300"
-                  >
-                    {cat.name}
-                  </Link>
-                </div>
-              </FadeUp>
-            ))}
-          </div>
-        </div>
-      </section>
+
 
       {/* LUXURY ABOUT BANNER */}
       <section className="bg-ivory py-[120px]">
