@@ -38,55 +38,19 @@ export default function Home() {
 
   return (
     <div className="bg-white">
-      {/* HERO SECTION - LUXURY EDITORIAL TWO-COLUMN */}
+      {/* HERO SECTION - LUXURY EDITORIAL (IMAGE ONLY) */}
       <section className="relative h-[90vh] md:h-screen w-full flex items-center justify-start overflow-hidden bg-[#F5F5F0]">
-        {/* Large Lifestyle Photography - Parallax, positioned to keep sandals visible on the right */}
+        {/* Large Lifestyle Photography - Parallax */}
         <div 
           className="absolute inset-0 bg-cover bg-[center_right_20%] md:bg-[center_right] lg:bg-[center_70%] bg-no-repeat opacity-100 bg-fixed"
           style={{ backgroundImage: `url('${mainBanner.image}')` }}
         ></div>
         
-        {/* Subtle gradient from left to ensure the card blends elegantly, only if needed, but glass handles it */}
-        
-        {/* Two-column layout container */}
-        <div className="container mx-auto px-6 relative z-10 w-full h-full flex items-center mt-12 md:mt-0">
-          
-          {/* LEFT (40%) - Content Card */}
-          <div className="w-full md:w-5/12 lg:w-2/5 flex items-center justify-start">
-            <FadeUp 
-              className="max-w-[420px] w-full bg-[#FAF9F6]/80 backdrop-blur-md p-8 md:p-12 rounded-[20px] shadow-[0_10px_40px_rgba(0,0,0,0.06)] border border-white/60" 
-              duration={1.5}
-            >
-              <span className="block text-[9px] md:text-[10px] font-bold tracking-[0.3em] text-gray-500 mb-6 uppercase">
-                Collection Printemps / Été
-              </span>
-              
-              <h1 className="text-4xl md:text-5xl font-serif text-black mb-5 leading-[1.1] uppercase tracking-wide">
-                La Qualité À Son Meilleur
-              </h1>
-              
-              <h2 className="text-sm font-sans text-gray-600 mb-8 font-light tracking-widest italic">
-                Savoir-faire marocain depuis 1997
-              </h2>
-              
-              <p className="text-gray-600 text-xs md:text-sm leading-[1.9] mb-10 font-light">
-                L'excellence du cuir véritable. Des créations façonnées à la main pour offrir élégance intemporelle et confort absolu.
-              </p>
-              
-              <Link 
-                to={mainBanner.link || "/collections/nouveau"} 
-                className="inline-flex items-center justify-center gap-3 bg-white text-black border border-gray-100 hover:border-black hover:shadow-xl px-10 py-4 text-[11px] font-bold tracking-[0.2em] uppercase transition-all duration-500 rounded-full group hover:-translate-y-1"
-              >
-                Découvrir <ArrowRight className="w-4 h-4 stroke-1 group-hover:translate-x-1 transition-transform duration-500" />
-              </Link>
-            </FadeUp>
-          </div>
-          
-          {/* RIGHT (60%) - Focus area for the sandals */}
-          <div className="hidden md:block md:w-7/12 lg:w-3/5 pointer-events-none"></div>
-
+        {/* Empty container just in case we need positioning layer later */}
+        <div className="container mx-auto px-6 relative z-10 w-full h-full flex items-center mt-12 md:mt-0 pointer-events-none">
         </div>
       </section>
+
 
       {/* REASSURANCE BAND */}
       <div className="bg-black text-white border-b border-white/10 relative z-20">
