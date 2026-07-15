@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import Layout from './layouts/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
+import ProtectedAdminRoute from './components/ProtectedAdminRoute';
 import WhatsAppButton from './components/WhatsAppButton';
 
 // Lazy loading de toutes les pages pour réduire le bundle initial
@@ -15,6 +16,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Account = lazy(() => import('./pages/Account'));
 const Invoice = lazy(() => import('./pages/Invoice'));
 const XrpLayout = lazy(() => import('./layouts/XrpLayout'));
+const AdminLogin = lazy(() => import('./pages/xrp/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/xrp/AdminDashboard'));
 const AdminProducts = lazy(() => import('./pages/xrp/AdminProducts'));
 const AdminCategories = lazy(() => import('./pages/xrp/AdminCategories'));
@@ -71,7 +73,8 @@ function App() {
             <Route path="*" element={<NotFoundPage />} />
           </Route>
 
-          <Route path="/xrp" element={<ProtectedRoute />}>
+          <Route path="/xrp/login" element={<AdminLogin />} />
+          <Route path="/xrp" element={<ProtectedAdminRoute />}>
             <Route element={<XrpLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<AdminProducts />} />

@@ -31,16 +31,21 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Clear tokens on 401
-      localStorage.removeItem('adminToken');
-      localStorage.removeItem('adminUser');
-      localStorage.removeItem('customerToken');
-      localStorage.removeItem('customerUser');
-      
-      // Redirect to login if not already on a login page
       const path = window.location.pathname;
-      if (path !== '/login' && !path.includes('/auth')) {
-        window.location.href = '/login';
+      const isAdminRoute = path.startsWith('/xrp');
+      
+      if (isAdminRoute) {
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        if (path !== '/xrp/login') {
+          window.location.href = '/xrp/login';
+        }
+      } else {
+        localStorage.removeItem('customerToken');
+        localStorage.removeItem('customerUser');
+        if (path !== '/login' && !path.includes('/auth')) {
+          window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(error);

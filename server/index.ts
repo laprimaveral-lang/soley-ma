@@ -93,7 +93,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key_123';
 
 // --- AUTH ROUTES ---
 // Admin Login
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
@@ -108,6 +108,16 @@ app.post('/api/login', async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
     
+    // Log the successful login
+    const ipAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    await prisma.activityLog.create({
+      data: {
+        adminId: user.id,
+        action: 'ADMIN_LOGIN',
+        details: `Successful admin login from IP: ${ipAddress}`,
+      }
+    });
+
     const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '1d' });
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
   } catch (error) {

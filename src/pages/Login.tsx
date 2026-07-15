@@ -25,22 +25,9 @@ export default function Login() {
     setLoading(true);
     try {
       await customerLogin({ email, password });
-      const userStr = localStorage.getItem('customerUser');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        if (user.role === 'admin') {
-          localStorage.setItem('adminToken', localStorage.getItem('customerToken') || '');
-          localStorage.setItem('adminUser', userStr);
-        }
-      }
       navigate('/account');
     } catch (err: any) {
-      try {
-        const data = await AuthService.login({ email, password });
-        if (data.user?.role === 'admin') navigate('/xrp');
-      } catch (adminErr: any) {
-        setError(err.response?.data?.error || adminErr.response?.data?.error || 'Erreur de connexion');
-      }
+      setError(err.response?.data?.error || 'Erreur de connexion');
     } finally {
       setLoading(false);
     }
