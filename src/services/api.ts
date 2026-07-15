@@ -27,6 +27,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Clear tokens on 401
+      localStorage.removeItem('adminToken');
+      localStorage.removeItem('adminUser');
+      localStorage.removeItem('customerToken');
+      localStorage.removeItem('customerUser');
+      
+      // Redirect to login if not already on a login page
+      const path = window.location.pathname;
+      if (path !== '/login' && !path.includes('/auth')) {
+        window.location.href = '/login';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const AuthService = {
   login: async (credentials: any) => {
     const res = await api.post('/login', credentials);
