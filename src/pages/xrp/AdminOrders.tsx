@@ -216,7 +216,17 @@ export default function AdminOrders() {
                 <label className="block text-sm font-bold text-gray-700 mb-2">Statut livraison</label>
                 <select 
                   value={formData.shippingStatus}
-                  onChange={e => setFormData({ ...formData, shippingStatus: e.target.value })}
+                  onChange={e => {
+                    const newShipping = e.target.value;
+                    let newStatus = formData.status;
+                    
+                    // Synchronisation intelligente des statuts
+                    if (newShipping === 'delivered') newStatus = 'delivered';
+                    else if (newShipping === 'in_transit') newStatus = 'shipped';
+                    else if (newShipping === 'preparing' && newStatus === 'pending') newStatus = 'processing';
+                    
+                    setFormData({ ...formData, shippingStatus: newShipping, status: newStatus });
+                  }}
                   className="w-full border border-gray-200 rounded-lg px-4 py-2 focus:ring-2 focus:ring-black focus:outline-none text-sm"
                 >
                   <option value="preparing">En préparation</option>
