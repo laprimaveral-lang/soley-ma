@@ -88,3 +88,75 @@ export const NotFound = () => (
     </a>
   </div>
 );
+
+export const CGV = () => (
+  <StaticPage 
+    title="Conditions Générales de Vente" 
+    content={
+      <>
+        <h3 className="text-xl font-bold mb-3 mt-8">1. Objet</h3>
+        <p className="mb-6">Les présentes Conditions Générales de Vente régissent les ventes de chaussures et accessoires sur le site Soley.ma. Tout achat implique l'acceptation sans réserve de ces conditions.</p>
+        
+        <h3 className="text-xl font-bold mb-3">2. Prix</h3>
+        <p className="mb-6">Les prix de nos produits sont indiqués en Dirhams Marocains (MAD), toutes taxes comprises, hors frais de traitement et d'expédition.</p>
+        
+        <h3 className="text-xl font-bold mb-3">3. Paiement</h3>
+        <p className="mb-6">Le règlement de vos achats s'effectue à la livraison (Cash on Delivery) ou par carte bancaire selon les options disponibles lors de la validation de la commande.</p>
+      </>
+    } 
+  />
+);
+
+export const Privacy = () => (
+  <StaticPage 
+    title="Politique de Confidentialité" 
+    content={
+      <>
+        <h3 className="text-xl font-bold mb-3 mt-8">Collecte des données</h3>
+        <p className="mb-6">Nous collectons les informations nécessaires pour traiter vos commandes : nom, adresse de livraison, numéro de téléphone et e-mail.</p>
+        
+        <h3 className="text-xl font-bold mb-3">Utilisation des données</h3>
+        <p className="mb-6">Vos données sont utilisées exclusivement pour l'expédition de vos commandes et pour vous informer de nos nouveautés, avec votre accord.</p>
+        
+        <h3 className="text-xl font-bold mb-3">Protection des données</h3>
+        <p className="mb-6">Nous nous engageons à ne jamais vendre ou céder vos données personnelles à des tiers. Vous pouvez à tout moment demander la modification ou la suppression de vos données.</p>
+      </>
+    } 
+  />
+);
+
+export const Cookies = () => (
+  <StaticPage 
+    title="Gestion des Cookies" 
+    content={
+      <>
+        <h3 className="text-xl font-bold mb-3 mt-8">Qu'est-ce qu'un cookie ?</h3>
+        <p className="mb-6">Un cookie est un petit fichier texte stocké sur votre appareil lors de votre visite sur notre site. Il permet de retenir vos préférences et d'améliorer votre navigation.</p>
+        
+        <h3 className="text-xl font-bold mb-3">Utilisation des cookies sur Soley.ma</h3>
+        <p className="mb-6">Nous utilisons des cookies essentiels pour le fonctionnement du panier d'achat, de la connexion à votre compte, et des cookies analytiques pour comprendre comment vous utilisez notre site et l'améliorer.</p>
+        
+        <h3 className="text-xl font-bold mb-3">Gestion de vos préférences</h3>
+        <p className="mb-6">Vous pouvez configurer votre navigateur pour refuser les cookies. Cependant, certaines fonctionnalités de notre site (comme le panier d'achat) pourraient ne plus fonctionner correctement.</p>
+      </>
+    } 
+  />
+);
+
+export const Returns = () => (
+  <StaticPage 
+    title="Politique de Retours" 
+    content={
+      <>
+        <h3 className="text-xl font-bold mb-3 mt-8">Conditions de retour</h3>
+        <p className="mb-6">Vous disposez d'un délai de 14 jours à compter de la réception de votre commande pour nous retourner les produits qui ne vous conviendraient pas.</p>
+        
+        <h3 className="text-xl font-bold mb-3">État des articles</h3>
+        <p className="mb-6">Les articles doivent être retournés neufs, non portés, et dans leur emballage d'origine. Tout article endommagé ou sali ne pourra être remboursé ni échangé.</p>
+        
+        <h3 className="text-xl font-bold mb-3">Frais de retour</h3>
+        <p className="mb-6">Sauf erreur de notre part (article défectueux ou erreur de modèle), les frais de retour sont à la charge du client.</p>
+      </>
+    } 
+  />
+);

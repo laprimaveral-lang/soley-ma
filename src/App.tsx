@@ -36,6 +36,10 @@ const AdminSettings = lazy(() => import('./pages/xrp/AdminSettings'));
 const StaticPages = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.About })));
 const FAQPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.FAQ })));
 const DeliveryPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.DeliveryReturns })));
+const CGVPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.CGV })));
+const PrivacyPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.Privacy })));
+const CookiesPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.Cookies })));
+const ReturnsPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.Returns })));
 const NotFoundPage = lazy(() => import('./pages/StaticPages').then(m => ({ default: m.NotFound })));
 
 // Composant de chargement élégant
@@ -71,6 +75,10 @@ function App() {
             <Route path="about" element={<StaticPages />} />
             <Route path="faq" element={<FAQPage />} />
             <Route path="delivery" element={<DeliveryPage />} />
+            <Route path="cgv" element={<CGVPage />} />
+            <Route path="privacy" element={<PrivacyPage />} />
+            <Route path="cookies" element={<CookiesPage />} />
+            <Route path="returns" element={<ReturnsPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Route>
 
