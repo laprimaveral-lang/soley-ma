@@ -8,6 +8,7 @@ import WhatsAppButton from './components/WhatsAppButton';
 const Home = lazy(() => import('./pages/Home'));
 const ProductList = lazy(() => import('./pages/ProductList'));
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Contact = lazy(() => import('./pages/Contact'));
 const Cart = lazy(() => import('./pages/Cart'));
 const Checkout = lazy(() => import('./pages/Checkout'));
 const Login = lazy(() => import('./pages/Login'));
@@ -66,6 +67,7 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="account/orders/:id/invoice" element={<Invoice />} />
             <Route path="account/*" element={<Account />} />
+            <Route path="contact" element={<Contact />} />
             <Route path="about" element={<StaticPages />} />
             <Route path="faq" element={<FAQPage />} />
             <Route path="delivery" element={<DeliveryPage />} />
