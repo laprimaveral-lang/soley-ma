@@ -31,7 +31,7 @@ export default function AddressesView() {
             <p className="font-bold text-black">John Doe</p>
             <p>123 Avenue Mohammed V</p>
             <p>Appartement 12, Étage 3</p>
-            <p>Casablanca, 20000</p>
+            <p>Fès, 30000</p>
             <p>Maroc</p>
             <p className="pt-2 text-gray-400">+212 6 00 00 00 00</p>
           </div>

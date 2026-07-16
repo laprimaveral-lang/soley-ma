@@ -6,7 +6,7 @@ export default function Contact() {
         <p>Nous serions ravis de vous entendre !</p>
         <p><strong>Email:</strong> laprimaveral@gmail.com</p>
         <p><strong>Téléphone:</strong> 06 61 11 96 78</p>
-        <p><strong>Adresse:</strong> Casablanca, Maroc</p>
+        <p><strong>Adresse:</strong> Fès, Maroc</p>
       </div>
     </div>
   );

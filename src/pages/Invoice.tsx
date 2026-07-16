@@ -53,7 +53,7 @@ export default function Invoice() {
         <div>
           <h1 className="text-2xl font-serif text-black uppercase tracking-widest mb-1">SOLEY.MA</h1>
           <p className="text-xs text-gray-400 font-light">Chaussures Femme Premium</p>
-          <p className="text-[10px] text-gray-400 font-light">Casablanca, Maroc</p>
+          <p className="text-[10px] text-gray-400 font-light">Fès, Maroc</p>
           <p className="text-[10px] text-gray-400 font-light">Tél: 06 61 11 96 78</p>
           <p className="text-[10px] text-gray-400 font-light">Contact: laprimaveral@gmail.com</p>
         </div>
